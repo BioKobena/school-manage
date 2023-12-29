@@ -106,13 +106,13 @@ const Student = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
+    padding: 25,
     backgroundColor: "#eff5f7",
     display: "flex",
     flexDirection: "column",
   },
   cardContainer: {
-    width: 180,
+    width: 170,
     height: 120,
     padding: 20,
     marginTop: 20,
