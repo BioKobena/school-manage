@@ -1,4 +1,4 @@
-import { View, Text, Image, Pressable, TextInput, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, Image, Pressable, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from '../../constants/colors';
@@ -14,6 +14,14 @@ const ParentLogin = () => {
     const navigation = useNavigation()
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [isChecked, setIsChecked] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleLoginParent = async () => {
+        setIsLoading(true);
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        setIsLoading(false);
+        navigation.navigate("ParentView");
+    };
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <View style={{ position: "absolute", justifyContent: "center", alignItems: "center" }}>
@@ -93,16 +101,27 @@ const ParentLogin = () => {
                     </View>
                 </View>
 
-                <Button
-                    title="Se connecter"
-                    filled
+                <TouchableOpacity
                     style={{
                         marginTop: 18,
                         marginBottom: 4,
-                        fontWeight: "bold"
+                        backgroundColor: COLORS.primary,
+                        borderRadius: 10,
+                        height: 50,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        opacity: isLoading ? 0.5 : 1,
                     }}
-                    onPress={() => navigation.navigate("ParentView")}
-                />
+                    disabled={isLoading}
+                    onPress={handleLoginParent}
+                >
+                    {isLoading ? (
+                        <ActivityIndicator size="small" color={COLORS.white} style={{ marginRight: 10 }} />
+                    ) : (
+                        <Text style={{ color: COLORS.white, fontWeight: 'bold' }}>Se connecter</Text>
+                    )}
+                </TouchableOpacity>
                 <View style={{
                     flexDirection: "row",
                     justifyContent: "center",

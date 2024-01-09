@@ -1,10 +1,10 @@
 import { View, Text, Image, Pressable, TextInput, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
-import COLORS from '../../constants/colors';
+import COLORS from '../../../constants/colors';
 import { Ionicons } from "@expo/vector-icons";
 import Checkbox from "expo-checkbox"
-import Button from '../Button';
+import Button from '../../Button';
 import LottieView from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -17,7 +17,7 @@ const StudentLogin = () => {
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <View style={{ position: "absolute", justifyContent: "center", alignItems: "center" }}>
-                <LottieView style={{ width: "90%", height: "90%", alignItems: "center" }} source={require('./welcomeStudent.json')} autoPlay loop />
+                <LottieView style={{ width: "90%", height: "90%", alignItems: "center" }} source={require('./../welcomeStudent.json')} autoPlay loop />
             </View>
             <View style={{ flex: 1, marginHorizontal: 22, position: "relative", top: 250 }}>
                 <View style={{ marginBottom: 12 }}>

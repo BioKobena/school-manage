@@ -2,31 +2,29 @@ import * as React from 'react';
 import { BlurView } from 'expo-blur';
 import { View, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import Notifications from '../components/notifications/Notifications';
 import Welcome from './Welcome';
 import Student from '../components/students/Student';
-import Details from '../components/Details';
-import StudentLogin from '../components/students/StudentLogin';
+import StudentLogin from '../components/students/Auth/StudentLogin'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ParentLogin from '../components/parents/ParentLogin';
 import ParentView from '../components/parents/ParentView';
-import Timetable from '../components/students/Timetable';
-import Card from '../components/students/Card';
-import Profile from '../components/students/Profile';
-import Schooling from '../components/students/Schooling';
-import Maquette from '../components/students/Maquette';
-import Library from '../components/students/Library';
-import Marks from '../components/students/Marks';
-import Group from '../components/students/Group';
-import Disconnect from '../components/students/Disconnect';
-import Documents from '../components/students/Documents';
-import Access from '../components/students/Access';
-import Curriculum from '../components/students/Curriculum';
-import Transport from '../components/students/Transport';
-import Course from '../components/students/Course';
+import Timetable from '../components/students/Menu/Timetable';
+import Card from '../components/students/Menu/Card';
+import Profile from '../components/students/Menu/Profile';
+import Schooling from '../components/students/Menu/Schooling';
+import Maquette from '../components/students/Menu/Maquette';
+import Library from '../components/students/Menu/Library';
+import Marks from '../components/students/Menu/Marks';
+import Group from '../components/students/Menu/Group';
+import Disconnect from '../components/students/Menu/Disconnect';
+import Documents from '../components/students/Menu/Documents';
+import Access from '../components/students/Menu/Access';
+import Curriculum from '../components/students/Menu/Curriculum';
+import Transport from '../components/students/Menu/Transport';
+import Course from '../components/students/Menu/Course';
 import COLORS from '../constants/colors';
 
 const Tab = createMaterialBottomTabNavigator();
@@ -203,7 +201,7 @@ const StudentScreen = () => {
                 }}
             />
             <StudentStack.Screen
-                name="Course"
+                name="Cours"
                 component={Course}
                 options={{
                     title: "Cours"
@@ -231,28 +229,8 @@ function HomeStackScreen() {
 const HomeScreen = () => {
     return (
         <Tab.Navigator
-            // screenOptions={({ route }) => ({
-            //     tabBarIcon: ({ focused, color, size }) => {
-            //         let iconName;
-
-            //         if (route.name === 'Etudiants') {
-            //             iconName = focused
-            //                 ? 'ios-school'
-            //                 : 'ios-school-outline';
-            //         } else if (route.name === 'Notifications') {
-            //             iconName = focused ? 'ios-notifications' : 'ios-notifications-outline';
-            //         }
-            //         else if (route.name === 'Parents') {
-            //             iconName = focused ? 'ios-person' : 'ios-person-outline';
-            //         }
-            //         return <Ionicons name={iconName} size={size} color={color} />;
-            //     },
-            //     tabBarActiveTintColor: '#4871f7',
-            //     tabBarInactiveTintColor: 'rgb(205, 209, 228)',
-            //     // tabBarBackground: 'rgb(205, 209, 228)'
-            // })}
             activeColor="#fff"
-            inactiveColor="#e8ecf1"
+            inactiveColor="rgb(205, 209, 200)"
             barStyle={{ backgroundColor: COLORS.primary, paddingBottom: 4 }}
             initialRouteName='Etudiants'
         >

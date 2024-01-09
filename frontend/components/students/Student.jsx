@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator, Animated } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import COLORS from '../../constants/colors';
 import { features } from '../../constants/features';
 import { useNavigation } from '@react-navigation/native';
@@ -8,97 +8,125 @@ import { SafeAreaView } from "react-native-safe-area-context";
 const Student = () => {
   const navigation = useNavigation()
 
-  const handleScreen = (navigationKey) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const scrollX = new Animated.Value(0);
+
+  useEffect(() => {
+    const scrollListener = scrollX.addListener(({ value }) => {
+      // Vous pouvez ajuster la valeur 20 selon vos besoins pour contrôler la vitesse du défilement
+      const offset = value / 20;
+      textTranslate.setValue(offset);
+    });
+
+    return () => {
+      scrollX.removeListener(scrollListener);
+    };
+  }, [scrollX]);
+  const textTranslate = new Animated.Value(0);
+  const handleScreen = async (navigationKey) => {
+
+    setIsLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+
+    setIsLoading(false);
+
     navigation.navigate(navigationKey);
     console.log(navigationKey)
   };
 
 
   return (
-    <ScrollView style={styles.container}>
-      <SafeAreaView
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          gap: 5,
-          // marginLeft:,
-          // position:"relative"
-        }}
-      >
-        <View
+    <>
+      <ScrollView style={styles.container}>
+        <SafeAreaView
           style={{
-            height: 200,
-            width: '100%',
             display: "flex",
             flexDirection: "row",
-            alignItems: "center",
-            gap: 5
+            gap: 5,
           }}
         >
-          <View>
-            <Image
-              source={{ uri: "https://img.freepik.com/psd-gratuit/portrait-jeune-femme-coiffure-afro-dreadlocks_23-2150164403.jpg?size=626&ext=jpg&ga=GA1.2.1998763568.1698434096&semt=ais" }}
-              style={{
-                height: 100,
-                width: 100,
-                borderRadius: 65
-              }}
-            />
-          </View>
+
           <View
             style={{
-              display:"flex",
-              flexDirection:"column",
+              height: 200,
+              width: '100%',
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 5
             }}
           >
-            <Text
+            <View>
+              <Image
+                source={{ uri: "https://img.freepik.com/psd-gratuit/portrait-jeune-femme-coiffure-afro-dreadlocks_23-2150164403.jpg?size=626&ext=jpg&ga=GA1.2.1998763568.1698434096&semt=ais" }}
+                style={{
+                  height: 100,
+                  width: 100,
+                  borderRadius: 65
+                }}
+              />
+            </View>
+            <View
               style={{
-                fontSize: 22,
-                marginVertical: 6,
-                fontWeight: "bold",
-                flexWrap: "wrap",
-                color: "#043b5c"
+                display: "flex",
+                flexDirection: "column",
               }}
-            >Kedma Goze</Text>
-            <Text
-              style={{
-                fontSize: 19,
-                color: "#1c474d",
-                flexWrap: "wrap",
-                zIndex:1000,
-                fontWeight:"700"
-      
-              }}
-            >Étudiante en Science Éco</Text>
-            <Text
-              style={{
-                fontSize: 16,
-                color: "#111",
-                flexWrap: "wrap",
-                fontWeight:"600"
-              }}
-            >Licence 1</Text>
-          </View>
-        </View>
-      </SafeAreaView>
+            >
+              <Text
+                style={{
+                  fontSize: 22,
+                  marginVertical: 6,
+                  fontWeight: "bold",
+                  flexWrap: "wrap",
+                  color: "#043b5c"
+                }}
+              >Kedma Goze</Text>
+              <Text
+                style={{
+                  fontSize: 19,
+                  color: "#1c474d",
+                  flexWrap: "wrap",
+                  zIndex: 1000,
+                  fontWeight: "700"
 
-      <View style={styles.menuEl}>
-        {
-          features.map((feature) => {
-            return (
-              <TouchableOpacity onPress={() => handleScreen(feature.navigation)} style={{ backgroundColor: feature.bgcolor, borderRadius: 15 }}>
-                <View style={[styles.cardContainer]} key={feature.id}>
-                  <View style={styles.iconContainer}>
-                    <Image style={{ width: 75, height: 75 }} source={{ uri: feature.icon }} />
+                }}
+              >Étudiante en Science Éco</Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  color: "#111",
+                  flexWrap: "wrap",
+                  fontWeight: "600"
+                }}
+              >Licence 1</Text>
+            </View>
+          </View>
+        </SafeAreaView>
+        <View style={styles.menuEl}>
+          {
+            features.map((feature) => {
+              return (
+                <TouchableOpacity onPress={() => handleScreen(feature.navigation)} style={{ backgroundColor: feature.bgcolor, borderRadius: 15 }}>
+                  <View style={[styles.cardContainer]} key={feature.id}>
+                    <View style={styles.iconContainer}>
+                      <Image style={{ width: 75, height: 75 }} source={{ uri: feature.icon }} />
+                    </View>
+                    <Text style={styles.cardTextOne}> {feature.item} </Text>
                   </View>
-                  <Text style={styles.cardTextOne}> {feature.item} </Text>
-                </View>
-              </TouchableOpacity>
-            )
-          })
-        }
-      </View>
-    </ScrollView>
+                </TouchableOpacity>
+              )
+            })
+          }
+        </View>
+
+        {isLoading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          </View>
+        )}
+      </ScrollView>
+    </>
   )
 }
 
@@ -158,7 +186,18 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 20,
     marginBottom: 50
-  }
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 })
 
 export default Student

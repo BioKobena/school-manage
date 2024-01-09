@@ -1,10 +1,19 @@
-import { View, Text, Pressable, Image } from 'react-native'
-import React from 'react'
+import { View, Text, Pressable, Image, ActivityIndicator } from 'react-native'
+import React, { useState } from 'react'
 import { LinearGradient } from "expo-linear-gradient";
 import COLORS from '../constants/colors';
 import Button from '../components/Button';
 
 const Welcome = ({ navigation }) => {
+
+    const [isLoading, setIsLoading] = useState(false);
+    const handleWelcome = async () => {
+        setIsLoading(true);
+        setTimeout(() => {
+            setIsLoading(false);
+            navigation.navigate("Home");
+        }, 2000);
+    };
 
     return (
         <LinearGradient
@@ -66,7 +75,7 @@ const Welcome = ({ navigation }) => {
                         fontSize: 46,
                         fontWeight: 800,
                         color: COLORS.white
-                    }}>sur Yehkla</Text>
+                    }}>sur IPIF</Text>
 
                     <View style={{ marginVertical: 22 }}>
                         <Text style={{
@@ -81,13 +90,18 @@ const Welcome = ({ navigation }) => {
                     </View>
 
                     <Button
-                        title="Suivant"
-                        onPress={() => navigation.navigate("Home")}
+                        title={isLoading ? "Chargement..." : "Suivant"}
+                        onPress={handleWelcome}
+                        disabled={isLoading} // Désactivez le bouton pendant le chargement
                         style={{
                             marginTop: 22,
                             width: "100%"
                         }}
-                    />
+                    >
+                        {isLoading && (
+                            <ActivityIndicator size="small" color={COLORS.white} style={{ marginLeft: 10 }} />
+                        )}
+                    </Button>
                 </View>
             </View>
         </LinearGradient>
