@@ -1,0 +1,41 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Etudiant {
+  id            Int      @id @default(autoincrement())
+  nom           String
+  prenoms       String
+  matricule     String   @unique
+  motDePasse    String   @unique
+  parentId      Int?     @unique
+  //Association d'un étudiant à un parent
+  parent        Parent?  @relation(fields: [parentId], references: [id])
+  lieuNaissance String
+  typeEtudiant  String
+  serieBAC      String
+  lieuResidence String
+}
+
+model Parent {
+  id         Int       @id @default(autoincrement())
+  matricule  String    @unique
+  motDePasse String    @unique
+  etudiants  Etudiant[] 
+}
+
+model Educateur {
+  id         Int    @id @default(autoincrement())
+  nom        String
+  prenoms    String
+  email      String @unique
+  motDePasse String
+}

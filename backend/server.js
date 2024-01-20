@@ -1,13 +1,27 @@
+// server.js
+
 const express = require("express");
+const cors = require('cors');
 const app = express();
-const PORT = 3000;
+const port = process.env.PORT || 3000;
+const bodyParser = require('body-parser');
+const studentController = require('./controllers/StudentController.js'); 
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
+app.use(bodyParser.json());
 
+// app.use('/create', ); 
+app.post('/create', studentController.createStudent);
+app.delete('/deleteStudent/:id', studentController.deleteStudents);
+app.get('/all', studentController.showAllStudents)
+app.get('/parents', studentController.showAllParents)
+app.get('/parents/:id', studentController.getParentOfStudent)
 
-
-app.get('/', (req, res)=>{
-    res.json("Backend of school application")
+app.get('/', (req, res) => {
+  res.json("Backend of school application");
 });
 
-app.listen(PORT, ()=>{
-    console.log(`Le serveur est lancé sur le port : ${PORT}`)
+app.listen(port, () => {
+  console.log(`Le serveur est lancé sur le port : ${port}`);
 });
