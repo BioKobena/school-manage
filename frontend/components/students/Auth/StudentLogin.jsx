@@ -1,4 +1,4 @@
-import { View, Text, Image, Pressable, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import { View, Text, Image, Pressable, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from '../../../constants/colors';
@@ -7,22 +7,36 @@ import Checkbox from "expo-checkbox"
 import Button from '../../Button';
 import LottieView from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios'
 
 
 const StudentLogin = () => {
-
     const navigation = useNavigation()
     const [isPasswordShown, setIsPasswordShown] = useState(false);
-    const [isChecked, setIsChecked] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
-    const handleButtonPress = () => {
+    const [matricule, setMatricule] = useState('');
+    const [password, setPassword] = useState('');
+    
+    const handleButtonPress = async () => {
         setIsLoading(true);
-        setTimeout(() => {
+        try {
+            const response = await axios.post('http://192.168.1.83:3000/authentificationStudent', {
+                matricule,
+                motDePasse: password,
+            });
+            if (response.data.success) {
+                Alert.alert('Bienvenue')
+                console.log(response.data)
+                navigation.navigate('Etudiants', { studentId: response.data.studentId.id });
+            } else {
+                console.log('Authentification échouée');
+            }
+        } catch (error) {
+            Alert.alert('Bienvenue')
+            console.error('Erreur authentification:', error);
+        } finally {
             setIsLoading(false);
-
-            // Naviguez vers l'écran "Etudiants"
-            navigation.navigate("Etudiants");
-        }, 2000); // Remplacez 2000 par la durée réelle de vos opérations de chargement
+        }
     };
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
@@ -54,6 +68,8 @@ const StudentLogin = () => {
                             style={{
                                 width: "100%"
                             }}
+                            value={matricule}
+                            onChangeText={setMatricule}
                         />
                     </View>
                 </View>
@@ -82,6 +98,8 @@ const StudentLogin = () => {
                             style={{
                                 width: "100%"
                             }}
+                            value={password}
+                            onChangeText={setPassword}
                         />
 
                         <TouchableOpacity
@@ -103,26 +121,26 @@ const StudentLogin = () => {
                     </View>
                 </View>
                 <TouchableOpacity
-        style={{
-          marginTop: 18,
-          marginBottom: 4,
-          backgroundColor: COLORS.primary,
-          borderRadius: 10,
-          height: 50,
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'row',
-          opacity: isLoading ? 0.5 : 1,
-        }}
-        disabled={isLoading}
-        onPress={handleButtonPress}
-      >
-        {isLoading ? (
-          <ActivityIndicator size="small" color={COLORS.white} style={{ marginRight: 10 }} />
-        ) : (
-          <Text style={{ color: COLORS.white, fontWeight: 'bold' }}>Se connecter</Text>
-        )}
-      </TouchableOpacity>
+                    style={{
+                        marginTop: 18,
+                        marginBottom: 4,
+                        backgroundColor: COLORS.primary,
+                        borderRadius: 10,
+                        height: 50,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        opacity: isLoading ? 0.5 : 1,
+                    }}
+                    disabled={isLoading}
+                    onPress={handleButtonPress}
+                >
+                    {isLoading ? (
+                        <ActivityIndicator size="small" color={COLORS.white} style={{ marginRight: 10 }} />
+                    ) : (
+                        <Text style={{ color: COLORS.white, fontWeight: 'bold' }}>Se connecter</Text>
+                    )}
+                </TouchableOpacity>
 
 
                 <View style={{

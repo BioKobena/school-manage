@@ -2,7 +2,10 @@ import { View, Text, Image, StyleSheet } from 'react-native'
 import React from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const ParentView = () => {
+const ParentView = ({ route }) => {
+    const { parentInfo } = route.params;
+
+    const etudiantInfo = parentInfo.etudiants[0];
     return (
         <View style={styles.container}>
             <Text
@@ -11,13 +14,13 @@ const ParentView = () => {
                     fontWeight: "bold",
                     flexWrap: "wrap",
                     color: "#fff",
-                    textAlign:"center",
-                    position:"absolute",
-                    top:"20%",
-                    left:"8%",
-                    backgroundColor:"#043b5c",
-                    padding:15,
-                    borderRadius:5
+                    textAlign: "center",
+                    position: "absolute",
+                    top: "20%",
+                    left: "8%",
+                    backgroundColor: "#043b5c",
+                    padding: 15,
+                    borderRadius: 5
                 }}
             >Bienvenue sur la page parent</Text>
             <SafeAreaView
@@ -25,7 +28,7 @@ const ParentView = () => {
                     display: "flex",
                     flexDirection: "row",
                     gap: 5,
-                    marginTop:25
+                    marginTop: 25
                     // position:"relative"
                 }}
             >
@@ -63,7 +66,7 @@ const ParentView = () => {
                                 flexWrap: "wrap",
                                 color: "#043b5c"
                             }}
-                        >Kedma Goze</Text>
+                        >{`${etudiantInfo.nom} ${etudiantInfo.prenoms}: ''`}</Text>
                         <Text
                             style={{
                                 fontSize: 19,
@@ -94,9 +97,9 @@ const styles = StyleSheet.create({
     container: {
         padding: 15,
         backgroundColor: "#eff5f7",
-        display:"flex",
-        justifyContent:"center",
-        alignItems:"center"
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
     }
 })
 export default ParentView

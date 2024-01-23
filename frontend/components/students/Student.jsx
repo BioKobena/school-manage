@@ -4,17 +4,16 @@ import COLORS from '../../constants/colors';
 import { features } from '../../constants/features';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const Student = () => {
-  const navigation = useNavigation()
-
+import axios from 'axios'
+const Student = ({ route }) => {
+  const navigation = useNavigation();
+  const { studentId } = route.params;
   const [isLoading, setIsLoading] = useState(false);
-
+  const [studentInfo, setStudentInfo] = useState(null);
   const scrollX = new Animated.Value(0);
 
   useEffect(() => {
     const scrollListener = scrollX.addListener(({ value }) => {
-      // Vous pouvez ajuster la valeur 20 selon vos besoins pour contrôler la vitesse du défilement
       const offset = value / 20;
       textTranslate.setValue(offset);
     });
@@ -25,16 +24,25 @@ const Student = () => {
   }, [scrollX]);
   const textTranslate = new Animated.Value(0);
   const handleScreen = async (navigationKey) => {
-
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
-
     setIsLoading(false);
-
-    navigation.navigate(navigationKey);
-    console.log(navigationKey)
+    navigation.navigate(navigationKey, { studentInfo, studentId });
   };
 
+
+  useEffect(() => {
+    const fetchStudentInfo = async () => {
+      try {
+        const response = await axios.get(`http://192.168.1.83:3000/students/${studentId}`);
+        console.log(response.data.student)
+        setStudentInfo(response.data.student);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des informations de l\'étudiant:', error);
+      }
+    };
+    fetchStudentInfo();
+  }, [studentId]);
 
   return (
     <>
@@ -81,7 +89,7 @@ const Student = () => {
                   flexWrap: "wrap",
                   color: "#043b5c"
                 }}
-              >Kedma Goze</Text>
+              >{studentInfo ? `${studentInfo.nom} ${studentInfo.prenoms}` : ''}</Text>
               <Text
                 style={{
                   fontSize: 19,
@@ -91,7 +99,7 @@ const Student = () => {
                   fontWeight: "700"
 
                 }}
-              >Étudiante en Science Éco</Text>
+              >{studentInfo ? studentInfo.filiere : ''}</Text>
               <Text
                 style={{
                   fontSize: 16,
@@ -99,7 +107,7 @@ const Student = () => {
                   flexWrap: "wrap",
                   fontWeight: "600"
                 }}
-              >Licence 1</Text>
+              >{studentInfo ? studentInfo.filiere : ''}</Text>
             </View>
           </View>
         </SafeAreaView>

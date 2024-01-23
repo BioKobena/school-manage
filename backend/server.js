@@ -14,7 +14,10 @@ app.use(bodyParser.json());
 // app.use('/create', ); 
 app.post('/create', studentController.createStudent);
 app.delete('/deleteStudent/:id', studentController.deleteStudents);
-app.get('/all', studentController.showAllStudents)
+app.get('/getStudent', studentController.showAllStudents)
+app.post('/authentificationStudent', studentController.authenticateStudent)
+app.get('/students/:studentId', studentController.getStudentById);
+app.post('/authentificationParent', studentController.authenticateParent)
 app.get('/parents', studentController.showAllParents)
 app.get('/parents/:id', studentController.getParentOfStudent)
 

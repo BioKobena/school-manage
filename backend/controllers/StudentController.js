@@ -21,44 +21,56 @@ function generateMatricule(nomEtudiant) {
 
 }
 
-
+const dateNaissPersonne = new Date();
 
 exports.createStudent = async (req, res) => {
   const {
     nom,
     prenoms,
+    sexe,
+    email,
+    filiere,
+    dateNaissPersonne,
     lieuNaissance,
     typeEtudiant,
     serieBAC,
     lieuResidence,
+    contact
   } = req.body;
 
-  const matricule = generateMatricule(nom);
-  const password = generatePassword();
+  const matricule = generatePassword();
+  const password = generateMatricule(nom);
 
   try {
-    const student = await Etudiant.create({
+    const createdParent = await Parent.create({
       data: {
-        nom:nom,
-        prenoms:prenoms,
         matricule,
         motDePasse: password,
+      },
+    });
+
+    const student = await Etudiant.create({
+      data: {
+        nom,
+        prenoms,
+        sexe,
+        email,
+        filiere,
+        dateNaissPersonne: dateNaissPersonne,
         lieuNaissance,
         typeEtudiant,
         serieBAC,
         lieuResidence,
-        parent: {
-          create: {
-            matricule,
-            motDePasse: password,
-          },
-        },
+        contact,
+        matricule,
+        motDePasse: password,
+        parentId: createdParent.id, 
       },
     });
 
     console.log('Bienvenue ici');
-    console.log(matricule)
-    console.log(password)
+    console.log(matricule);
+    console.log(password);
 
     res.status(201).json({
       message: 'Étudiant et parent créés avec succès!',
@@ -70,6 +82,7 @@ exports.createStudent = async (req, res) => {
   }
 };
 
+
 exports.deleteStudents = async (req, res) => {
 
   const { id } = req.params
@@ -77,9 +90,10 @@ exports.deleteStudents = async (req, res) => {
 
     const deleteStudent = await Etudiant.delete({
       where: {
-        id : parseInt(id)
+        id: parseInt(id)
       }
     })
+    if (!deleteStudent) return res.status(404).json({ error: "Etudiant en erreur" })
     res.status(201).json({ message: "Etudiant supprimé avec succès", deleteStudent })
   } catch (error) {
     res.status(400).json({ error: "Echec de la suppression" })
@@ -175,4 +189,92 @@ exports.getParentOfStudent = async (req, res) => {
     res.status(500).json({ error: "Erreur lors de la récupération des données du parent de l'étudiant." });
   }
 
+};
+
+exports.authenticateStudent = async (req, res) => {
+  const { matricule, motDePasse } = req.body;
+
+  try {
+    const student = await Etudiant.findUnique({
+      where: {
+        matricule
+      }
+    });
+
+
+    if (student && student.motDePasse === motDePasse) {
+      res.status(200).json({ success: true, message: 'Authentification réussie', studentId: student });
+      console.log(student.id)
+      // console.log('erreur tout court')
+    } else {
+      res.status(401).json({ success: false, error: 'Matricule ou mot de passe incorrect' });
+      console.log('Erreur de matricule')
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Erreur lors de l\'authentification' });
+  }
+};
+
+exports.authenticateParent = async (req, res) => {
+  const { matricule, motDePasse } = req.body;
+
+  try {
+    const parent = await Parent.findUnique({
+      where: {
+        matricule,
+      },
+      include: {
+        etudiants: true, 
+      },
+    });
+
+    if (!parent) {
+      return res.status(404).json({
+        success: false,
+        error: 'Matricule parent non trouvé',
+      });
+    }
+
+    if (parent.motDePasse === motDePasse) {
+      res.status(200).json({
+        success: true,
+        message: 'Authentification réussie',
+        parent,
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        error: 'Matricule ou mot de passe incorrect pour le parent',
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      error: "Erreur lors de l'authentification du parent",
+    });
+  }
+};
+
+
+exports.getStudentById = async (req, res) => {
+  const { studentId } = req.params;
+
+  try {
+    const student = await Etudiant.findUnique({
+      where: {
+        id: parseInt(studentId)
+      }
+    });
+
+    if (student) {
+      res.status(200).json({ success: true, student });
+    } else {
+      res.status(404).json({ success: false, error: 'Étudiant non trouvé' });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Erreur lors de la récupération des informations de l\'étudiant' });
+  }
 };

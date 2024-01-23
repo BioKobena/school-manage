@@ -1,4 +1,4 @@
-import { View, Text, Image, Pressable, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import { View, Text, Image, Pressable, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from '../../constants/colors';
@@ -7,21 +7,46 @@ import Checkbox from "expo-checkbox"
 import Button from '../Button';
 import LottieView from 'lottie-react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios'
 
 
 const ParentLogin = () => {
-
     const navigation = useNavigation()
     const [isPasswordShown, setIsPasswordShown] = useState(false);
-    const [isChecked, setIsChecked] = useState(false)
     const [isLoading, setIsLoading] = useState(false);
+    const [matricule, setMatricule] = useState('');
+    const [password, setPassword] = useState('');
 
     const handleLoginParent = async () => {
         setIsLoading(true);
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        setIsLoading(false);
-        navigation.navigate("ParentView");
+
+        try {
+            const response = await axios.post('http://192.168.1.83:3000/authentificationParent', {
+                matricule,
+                motDePasse: password,
+            });
+
+            if (response.data.success) {
+                Alert.alert('Bienvenue');
+
+                // Accédez aux informations du parent et de l'étudiant
+                const parentInfo = response.data.parent;
+                console.log(parentInfo)
+                const etudiantInfo = parentInfo.etudiants[0]; // Assurez-vous que les informations de l'étudiant sont présentes
+
+                // Naviguez vers l'écran suivant (peut-être avec les informations du parent/étudiant)
+                navigation.navigate('ParentView', { parentInfo, etudiantInfo });
+            } else {
+                Alert.alert('Erreur', 'Matricule ou mot de passe incorrect.');
+            }
+        } catch (error) {
+            Alert.alert('Erreur', 'Erreur lors de l\'authentification. Veuillez réessayer.');
+            console.error('Erreur authentification:', error);
+        } finally {
+            setIsLoading(false);
+        }
     };
+
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <View style={{ position: "absolute", justifyContent: "center", alignItems: "center" }}>
@@ -46,12 +71,14 @@ const ParentLogin = () => {
                         paddingLeft: 22,
                     }}>
                         <TextInput
-                            placeholder="Entrez le matricule de l'étudiant"
+                            placeholder='Entrez votre matricule'
                             placeholderTextColor={COLORS.black}
                             keyboardType='email-address'
                             style={{
                                 width: "100%"
                             }}
+                            value={matricule}
+                            onChangeText={setMatricule}
                         />
                     </View>
                 </View>
@@ -74,12 +101,14 @@ const ParentLogin = () => {
                         paddingLeft: 22
                     }}>
                         <TextInput
-                            placeholder='Entrez le code parent'
+                            placeholder='Entrez votre mot de passe'
                             placeholderTextColor={COLORS.black}
                             secureTextEntry={isPasswordShown}
                             style={{
                                 width: "100%"
                             }}
+                            value={password}
+                            onChangeText={setPassword}
                         />
 
                         <TouchableOpacity

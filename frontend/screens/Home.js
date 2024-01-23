@@ -189,9 +189,7 @@ const StudentScreen = () => {
             <StudentStack.Screen
                 name="Curriculum"
                 component={Curriculum}
-                options={{
-                    title: "Curriculum Vitae"
-                }}
+                options={({ route }) => ({ title: 'Curriculum Vitae' })}
             />
             <StudentStack.Screen
                 name="Transport"
