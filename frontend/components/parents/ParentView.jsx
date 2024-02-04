@@ -1,105 +1,109 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
-import React from 'react'
-import { SafeAreaView } from "react-native-safe-area-context";
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import axios from 'axios';
+
+const backendUrl = "http://192.168.1.83:3000"
 
 const ParentView = ({ route }) => {
-    const { parentInfo } = route.params;
+  const { parentInfo } = route.params;
+  const etudiantInfo = parentInfo.etudiants[0];
+  const [studentInfo, setStudentInfo] = useState(null);
 
-    const etudiantInfo = parentInfo.etudiants[0];
-    return (
-        <View style={styles.container}>
-            <Text
-                style={{
-                    fontSize: 22,
-                    fontWeight: "bold",
-                    flexWrap: "wrap",
-                    color: "#fff",
-                    textAlign: "center",
-                    position: "absolute",
-                    top: "20%",
-                    left: "8%",
-                    backgroundColor: "#043b5c",
-                    padding: 15,
-                    borderRadius: 5
-                }}
-            >Bienvenue sur la page parent</Text>
-            <SafeAreaView
-                style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    gap: 5,
-                    marginTop: 25
-                    // position:"relative"
-                }}
-            >
-                <View
-                    style={{
-                        height: 200,
-                        width: '100%',
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                        gap: 5
-                    }}
-                >
-                    <View>
-                        <Image
-                            source={{ uri: "https://img.freepik.com/psd-gratuit/portrait-jeune-femme-coiffure-afro-dreadlocks_23-2150164403.jpg?size=626&ext=jpg&ga=GA1.2.1998763568.1698434096&semt=ais" }}
-                            style={{
-                                height: 100,
-                                width: 100,
-                                borderRadius: 65
-                            }}
-                        />
-                    </View>
-                    <View
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                        }}
-                    >
-                        <Text
-                            style={{
-                                fontSize: 22,
-                                marginVertical: 6,
-                                fontWeight: "bold",
-                                flexWrap: "wrap",
-                                color: "#043b5c"
-                            }}
-                        >{`${etudiantInfo.nom} ${etudiantInfo.prenoms}: ''`}</Text>
-                        <Text
-                            style={{
-                                fontSize: 19,
-                                color: "#1c474d",
-                                flexWrap: "wrap",
-                                zIndex: 1000,
-                                fontWeight: "700"
+  useEffect(() => {
+    const fetchStudentInfo = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/students/${etudiantInfo.id}`);
+        setStudentInfo(response.data.student);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des informations de l\'étudiant:', error);
+      }
+    };
+    fetchStudentInfo();
+  }, [etudiantInfo.id]);
 
-                            }}
-                        >Étudiante en Science Éco</Text>
-                        <Text
-                            style={{
-                                fontSize: 16,
-                                color: "#111",
-                                flexWrap: "wrap",
-                                fontWeight: "600"
-                            }}
-                        >Licence 1</Text>
-                    </View>
-                </View>
-            </SafeAreaView>
-        </View>
-    )
-}
+  return (
+    <ScrollView style={styles.container}>
+      <Image
+        source={{ uri: 'https://img.freepik.com/photos-gratuite/souriante-jeune-etudiante-afro-americaine-sac-dos-tenant-livres_141793-123010.jpg?size=626&ext=jpg&ga=GA1.2.243878169.1698685310&semt=ais' }}
+        style={styles.image}
+      />
+      <View style={styles.card}>
+        <Text style={styles.title}>Votre profil</Text>
+        {studentInfo && (
+          <>
+            {renderInfo('Nom', studentInfo.nom)}
+            {renderInfo('Prénoms', studentInfo.prenoms)}
+            {renderInfo('Sexe', studentInfo.sexe)}
+            {renderInfo('Email', studentInfo.email)}
+            {renderInfo('Lieu de naissance', studentInfo.lieuNaissance)}
+            {renderInfo('Filière', studentInfo.filiere)}
+            {renderInfo('Date de naissance', studentInfo.dateNaissPersonne)}
+            {renderInfo('Serie du BAC', studentInfo.serieBAC)}
+            {renderInfo('Contact', studentInfo.contact)}
+            {renderInfo('Matricule', studentInfo.matricule)}
+            {renderInfo('Mot de passe', studentInfo.motDePasse)}
+          </>
+        )}
+      </View>
+    </ScrollView>
+  );
+};
 
+const renderInfo = (label, value) => (
+  <View style={styles.infoContainer} key={label}>
+    <Text style={styles.label}>{label}:</Text>
+    <Text style={styles.value}>{value}</Text>
+  </View>
+);
 
 const styles = StyleSheet.create({
-    container: {
-        padding: 15,
-        backgroundColor: "#eff5f7",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center"
-    }
-})
-export default ParentView
+  container: {
+    flex: 1,
+    backgroundColor: '#f4f4f4',
+    width:'100%'
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    margin: 16,
+    padding: 26,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  image: {
+    width: '100%',
+    height: 350,
+    // borderRadius: 50,
+    marginBottom: -15,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#333',
+    textAlign:'center'
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    paddingBottom: 8,
+  },
+  label: {
+    flex: 1,
+    fontWeight: 'bold',
+    color: '#555',
+    fontSize: 16,
+  },
+  value: {
+    flex: 2,
+    color: '#333',
+    fontSize: 16,
+  },
+});
+
+export default ParentView;

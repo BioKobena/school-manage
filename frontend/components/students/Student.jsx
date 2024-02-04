@@ -5,6 +5,10 @@ import { features } from '../../constants/features';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from 'axios'
+import { ALERT_TYPE, Dialog } from 'react-native-alert-notification'
+
+const backendUrl = "http://192.168.1.83:3000"
+
 const Student = ({ route }) => {
   const navigation = useNavigation();
   const { studentId } = route.params;
@@ -34,16 +38,21 @@ const Student = ({ route }) => {
   useEffect(() => {
     const fetchStudentInfo = async () => {
       try {
-        const response = await axios.get(`http://192.168.1.83:3000/students/${studentId}`);
+        const response = await axios.get(`${backendUrl}/students/${studentId}`);
         console.log(response.data.student)
         setStudentInfo(response.data.student);
       } catch (error) {
+        Dialog.show({
+          type: ALERT_TYPE.DANGER,
+          title: 'Erreur',
+          textBody: "Erreur",
+          button: 'fermer',
+        })
         console.error('Erreur lors de la récupération des informations de l\'étudiant:', error);
       }
     };
     fetchStudentInfo();
   }, [studentId]);
-
   return (
     <>
       <ScrollView style={styles.container}>

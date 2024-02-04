@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import { Card, Title, Paragraph } from 'react-native-paper';
 import axios from 'axios'
 
+const backendUrl = "http://192.168.1.83:3000"
 const Curriculum = ({ route }) => {
   const { studentId } = route.params;
   console.log(studentId)
@@ -11,7 +12,7 @@ const Curriculum = ({ route }) => {
   useEffect(() => {
     const fetchStudentInfo = async () => {
       try {
-        const response = await axios.get(`http://192.168.1.83:3000/students/${studentId}`);
+        const response = await axios.get(`${backendUrl}/students/${studentId}`);
         console.log(response.data.student);
         setStudentInfo(response.data.student);
       } catch (error) {

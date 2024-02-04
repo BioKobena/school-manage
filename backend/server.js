@@ -5,7 +5,7 @@ const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
 const bodyParser = require('body-parser');
-const studentController = require('./controllers/StudentController.js'); 
+const studentController = require('./controllers/StudentController.js');
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json())
@@ -18,6 +18,8 @@ app.get('/getStudent', studentController.showAllStudents)
 app.post('/authentificationStudent', studentController.authenticateStudent)
 app.get('/students/:studentId', studentController.getStudentById);
 app.post('/authentificationParent', studentController.authenticateParent)
+app.post('/student-parent', studentController.createStudentAndParent)
+app.get('/searchStudents/', studentController.searchStudents)
 app.get('/parents', studentController.showAllParents)
 app.get('/parents/:id', studentController.getParentOfStudent)
 

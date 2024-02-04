@@ -23,6 +23,74 @@ function generateMatricule(nomEtudiant) {
 
 const dateNaissPersonne = new Date();
 
+
+exports.createStudentAndParent = async (req, res) => {
+  const {
+    nom,
+    prenoms,
+    sexe,
+    email,
+    filiere,
+    dateNaissPersonne,
+    lieuNaissance,
+    typeEtudiant,
+    serieBAC,
+    lieuResidence,
+    contact,
+    namePere,
+    contactPere,
+    nameMere,
+    contactMere
+  } = req.body;
+
+  // Génération de mot de passe et matricule
+  const matricule = generateMatricule(nom);
+  const password = generatePassword();
+
+  try {
+    // Création du parent
+    const createdParent = await Parent.create({
+      data: {
+        matricule: matricule + 'P', // Ajoutez une indication pour le parent
+        motDePasse: password,
+      },
+    });
+
+    // Création de l'étudiant associé au parent
+    const student = await Etudiant.create({
+      data: {
+        nom,
+        prenoms,
+        sexe,
+        email,
+        filiere,
+        dateNaissPersonne,
+        lieuNaissance,
+        typeEtudiant,
+        serieBAC,
+        lieuResidence,
+        contact,
+        matricule: matricule, // Ajoutez une indication pour l'étudiant
+        motDePasse: password,
+        parentId: createdParent.id,
+        namePere,
+        contactPere,
+        nameMere,
+        contactMere,
+      },
+    });
+
+    res.status(201).json({
+      message: 'Étudiant et parent créés avec succès!',
+      student,
+      parent: createdParent,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erreur lors de la création de l'étudiant et du parent" });
+  }
+};
+
 exports.createStudent = async (req, res) => {
   const {
     nom,
@@ -64,7 +132,7 @@ exports.createStudent = async (req, res) => {
         contact,
         matricule,
         motDePasse: password,
-        parentId: createdParent.id, 
+        parentId: createdParent.id,
       },
     });
 
@@ -102,7 +170,6 @@ exports.deleteStudents = async (req, res) => {
 }
 
 exports.updateStudents = async (req, res) => {
-
   const { id } = req.params
   const {
     nom,
@@ -191,6 +258,24 @@ exports.getParentOfStudent = async (req, res) => {
 
 };
 
+exports.searchStudents = async (req, res) => {
+  try {
+    const searchValue = req.query.searchValue.toLowerCase();
+    const filteredStudents = await Etudiant.findMany({
+      where: {
+        nom: {
+          contains: searchValue,
+          mode: 'insensitive',
+        },
+      },
+    });
+    res.json(filteredStudents);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erreur lors de la recherche des étudiants" });
+  }
+};
+
 exports.authenticateStudent = async (req, res) => {
   const { matricule, motDePasse } = req.body;
 
@@ -205,7 +290,6 @@ exports.authenticateStudent = async (req, res) => {
     if (student && student.motDePasse === motDePasse) {
       res.status(200).json({ success: true, message: 'Authentification réussie', studentId: student });
       console.log(student.id)
-      // console.log('erreur tout court')
     } else {
       res.status(401).json({ success: false, error: 'Matricule ou mot de passe incorrect' });
       console.log('Erreur de matricule')
@@ -225,7 +309,7 @@ exports.authenticateParent = async (req, res) => {
         matricule,
       },
       include: {
-        etudiants: true, 
+        etudiants: true,
       },
     });
 
@@ -278,3 +362,5 @@ exports.getStudentById = async (req, res) => {
     res.status(500).json({ success: false, error: 'Erreur lors de la récupération des informations de l\'étudiant' });
   }
 };
+
+

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { BlurView } from 'expo-blur';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet,ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
@@ -265,7 +265,7 @@ const HomeScreen = () => {
 
 function Nav() {
     return (
-        <NavigationContainer>
+        <NavigationContainer fallback={<ActivityIndicator animation/>}>
             <Stack.Navigator
                 initialRouteName='Welcome'
             >

@@ -11,23 +11,27 @@ generator client {
 }
 
 model Etudiant {
-  id                Int    @id @default(autoincrement())
+  id                Int      @id @default(autoincrement())
   nom               String
   prenoms           String
   sexe              String
-  email             String @unique
+  email             String   @unique
   filiere           String
   dateNaissPersonne String
-  matricule         String @unique
-  motDePasse        String @unique
-  parentId          Int    @unique
-  //Association d'un étudiant à un parent
-  parent            Parent @relation(fields: [parentId], references: [id])
+  matricule         String   @unique
+  motDePasse        String   @unique
+  parent            Parent?  @relation(fields: [parentId], references: [id])
+  parentId          Int?
   lieuNaissance     String
   typeEtudiant      String
   serieBAC          String
   lieuResidence     String
   contact           String
+  dateInscription   DateTime @default(now())
+  namePere          String
+  contactPere       String
+  nameMere          String
+  contactMere       String
 }
 
 model Parent {
@@ -36,11 +40,17 @@ model Parent {
   motDePasse String     @unique
   etudiants  Etudiant[]
 }
-
 model Educateur {
   id         Int    @id @default(autoincrement())
   nom        String
   prenoms    String
   email      String @unique
   motDePasse String
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
 }
