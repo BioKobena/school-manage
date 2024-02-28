@@ -18,19 +18,20 @@ function generateMatricule(nomEtudiant) {
   const randomChars = Math.random().toString(36).substring(2, 6).toUpperCase();
   const specialChar = '@';
   return currentYear + specialChar + randomChars;
-
 }
 
 const dateNaissPersonne = new Date();
 
+// Importez les modèles nécessaires
 
-exports.createStudentAndParent = async (req, res) => {
+exports.createStudent = async (req, res) => {
   const {
     nom,
     prenoms,
     sexe,
     email,
-    filiere,
+    filiereId,
+    classeId,
     dateNaissPersonne,
     lieuNaissance,
     typeEtudiant,
@@ -43,95 +44,39 @@ exports.createStudentAndParent = async (req, res) => {
     contactMere
   } = req.body;
 
-  // Génération de mot de passe et matricule
-  const matricule = generateMatricule(nom);
+  const matricule = generateMatricule();
   const password = generatePassword();
 
   try {
     // Création du parent
     const createdParent = await Parent.create({
       data: {
-        matricule: matricule + 'P', // Ajoutez une indication pour le parent
-        motDePasse: password,
+        username: generateMatricule(),
+        password: generatePassword(),
       },
     });
 
-    // Création de l'étudiant associé au parent
+    // Création de l'étudiant
     const student = await Etudiant.create({
       data: {
         nom,
         prenoms,
         sexe,
         email,
-        filiere,
+        filiereId,
+        classeId,
         dateNaissPersonne,
+        motDePasse: generatePassword(),
+        matricule: generateMatricule(),
         lieuNaissance,
         typeEtudiant,
         serieBAC,
         lieuResidence,
         contact,
-        matricule: matricule, // Ajoutez une indication pour l'étudiant
-        motDePasse: password,
-        parentId: createdParent.id,
         namePere,
         contactPere,
         nameMere,
         contactMere,
-      },
-    });
-
-    res.status(201).json({
-      message: 'Étudiant et parent créés avec succès!',
-      student,
-      parent: createdParent,
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Erreur lors de la création de l'étudiant et du parent" });
-  }
-};
-
-exports.createStudent = async (req, res) => {
-  const {
-    nom,
-    prenoms,
-    sexe,
-    email,
-    filiere,
-    dateNaissPersonne,
-    lieuNaissance,
-    typeEtudiant,
-    serieBAC,
-    lieuResidence,
-    contact
-  } = req.body;
-
-  const matricule = generatePassword();
-  const password = generateMatricule(nom);
-
-  try {
-    const createdParent = await Parent.create({
-      data: {
-        matricule,
-        motDePasse: password,
-      },
-    });
-
-    const student = await Etudiant.create({
-      data: {
-        nom,
-        prenoms,
-        sexe,
-        email,
-        filiere,
-        dateNaissPersonne: dateNaissPersonne,
-        lieuNaissance,
-        typeEtudiant,
-        serieBAC,
-        lieuResidence,
-        contact,
-        matricule,
-        motDePasse: password,
         parentId: createdParent.id,
       },
     });
@@ -151,11 +96,11 @@ exports.createStudent = async (req, res) => {
 };
 
 
-exports.deleteStudents = async (req, res) => {
 
+
+exports.deleteStudents = async (req, res) => {
   const { id } = req.params
   try {
-
     const deleteStudent = await Etudiant.delete({
       where: {
         id: parseInt(id)
@@ -288,7 +233,7 @@ exports.authenticateStudent = async (req, res) => {
 
 
     if (student && student.motDePasse === motDePasse) {
-      res.status(200).json({ success: true, message: 'Authentification réussie', studentId: student });
+      res.status(200).json({ success: true, message: 'Authentification réussie', studentId: student.id });
       console.log(student.id)
     } else {
       res.status(401).json({ success: false, error: 'Matricule ou mot de passe incorrect' });

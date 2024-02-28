@@ -10,6 +10,8 @@ import { ALERT_TYPE, Dialog } from 'react-native-alert-notification'
 const backendUrl = "http://192.168.1.83:3000"
 
 const Student = ({ route }) => {
+
+
   const navigation = useNavigation();
   const { studentId } = route.params;
   const [isLoading, setIsLoading] = useState(false);
@@ -27,6 +29,7 @@ const Student = ({ route }) => {
     };
   }, [scrollX]);
   const textTranslate = new Animated.Value(0);
+  
   const handleScreen = async (navigationKey) => {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 2000));

@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = "mongodb+srv://ipifDB:eYhpdmNgM60QWmFW@ipifdb.pacf3f7.mongodb.net/ipifDB"
+}
+
+// Étudiant Model
+model Etudiant {
+  id                String         @id @default(auto()) @map("_id") @db.ObjectId
+  nom               String
+  prenoms           String
+  sexe              String
+  email             String         @unique
+  filiereId         String
+  filiere           Filiere        @relation(fields: [filiereId], references: [id])
+  classeId          String
+  classe            Classe         @relation(fields: [classeId], references: [id])
+  dateNaissPersonne DateTime
+  motDePasse        String         @unique
+  matricule         String         @unique
+  parentId          String
+  parent            Parent         @relation(fields: [parentId], references: [id])
+  lieuNaissance     String
+  typeEtudiant      String
+  serieBAC          String
+  lieuResidence     String
+  contact           String
+  dateInscription   DateTime       @default(now())
+  namePere          String
+  contactPere       String
+  nameMere          String
+  contactMere       String
+  isActive          Boolean
+  notifications     Notification[]
+  notes             Note[]
+}
+
+/// Parent Model
+model Parent {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  username      String
+  password      String
+  enfants       Etudiant[] 
+  notifications Notification[] 
+}
+
+// Notification Model
+model Notification {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  title        String
+  content      String
+  createdAt    DateTime    @default(now())
+  professeurId String?
+  professeur   Professeur? @relation(fields: [professeurId], references: [id])
+  etudiantId   String
+  etudiant     Etudiant    @relation(fields: [etudiantId], references: [id])
+  parentId     String?
+  parent       Parent?     @relation(fields: [parentId], references: [id])
+}
+
+// Note Model
+model Note {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  devoir        Float
+  examen        Float
+  interrogation Float
+  etudiantId    String
+  etudiant      Etudiant @relation(fields: [etudiantId], references: [id])
+}
+
+// Professeur Model
+model Professeur {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  nom           String
+  prenoms       String
+  email         String
+  motDePasse    String
+  notifications Notification[]
+}
+
+// Filiere Model
+model Filiere {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  nom       String
+  etudiants Etudiant[]
+}
+
+// Classe Model
+model Classe {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  nom       String
+  etudiants Etudiant[]
+}

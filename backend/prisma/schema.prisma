@@ -11,35 +11,43 @@ generator client {
 }
 
 model Etudiant {
-  id                Int      @id @default(autoincrement())
+  id                Int            @id @default(autoincrement())
   nom               String
   prenoms           String
   sexe              String
-  email             String   @unique
-  filiere           String
-  dateNaissPersonne String
-  matricule         String   @unique
-  motDePasse        String   @unique
-  parent            Parent?  @relation(fields: [parentId], references: [id])
-  parentId          Int?
+  email             String         @unique
+  filiereId         Int
+  filiere           Filiere        @relation(fields: [filiereId], references: [id])
+  classeId          Int
+  classe            Classe         @relation(fields: [classeId], references: [id])
+  dateNaissPersonne DateTime
+  matricule         String         @unique
+  motDePasse        String         @unique
+  parentId          Int
+  parent            Parent        @relation("enfantOf", fields: [parentId], references: [id])
   lieuNaissance     String
   typeEtudiant      String
   serieBAC          String
   lieuResidence     String
   contact           String
-  dateInscription   DateTime @default(now())
+  dateInscription   DateTime       @default(now())
   namePere          String
   contactPere       String
   nameMere          String
   contactMere       String
+  isActive          Boolean       @default(true)
+  Notification      Notification[]
+  Note              Note[]
 }
 
 model Parent {
-  id         Int        @id @default(autoincrement())
-  matricule  String     @unique
-  motDePasse String     @unique
-  etudiants  Etudiant[]
+  id           Int            @id @default(autoincrement())
+  username    String         @unique
+  password   String         @unique
+  enfants      Etudiant[]     @relation("enfantOf")
+  Notification Notification[]
 }
+
 model Educateur {
   id         Int    @id @default(autoincrement())
   nom        String
@@ -48,9 +56,47 @@ model Educateur {
   motDePasse String
 }
 
+model Professeur {
+  id           Int            @id @default(autoincrement())
+  nom          String
+  prenoms      String
+  email        String         @unique
+  motDePasse   String
+  Notification Notification[]
+}
+
 model Notification {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  createdAt DateTime @default(now())
+  id           Int         @id @default(autoincrement())
+  title        String
+  content      String
+  createdAt    DateTime    @default(now())
+  professeur   Professeur? @relation(fields: [professeurId], references: [id])
+  professeurId Int?
+  etudiant     Etudiant?   @relation(fields: [etudiantId], references: [id])
+  etudiantId   Int?
+  parent       Parent?     @relation(fields: [parentId], references: [id])
+  parentId     Int?
+}
+
+model Note {
+  id            Int      @id @default(autoincrement())
+  devoir        Float
+  examen        Float
+  interrogation Float
+  etudiant      Etudiant @relation(fields: [etudiantId], references: [id])
+  etudiantId    Int
+}
+
+model Filiere {
+  id       Int        @id @default(autoincrement())
+  nom      String
+  // Autres champs spécifiques à la filière
+  Etudiant Etudiant[]
+}
+
+model Classe {
+  id       Int        @id @default(autoincrement())
+  nom      String
+  // Autres champs spécifiques à la classe
+  Etudiant Etudiant[]
 }
