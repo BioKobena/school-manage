@@ -3,6 +3,10 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000
 const bodyParser = require('body-parser');
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
+app.use(bodyParser.json());
 
 //Mes Controllers Etudiants
 const studentOptions = require('./controller/studentController')
@@ -36,6 +40,8 @@ app.get('/getStudents', studentOptions.getAllStudents)
 app.get('/getOneStudent/:id', studentOptions.getOneStudent)
 app.get('/deleteStudent/:id', studentOptions.deleteOneStudent)
 app.get('/searchStudents/', studentOptions.searchStudents)
+app.get('/parents', studentOptions.getAllParents)
+app.post('/authParent', studentOptions.authenticateParent)
 
 //Mes routes Mobile
 app.post('/authStudent', studentOptions.authenticateStudent)

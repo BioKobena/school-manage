@@ -15,7 +15,7 @@ const StudentLogin = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [matricule, setMatricule] = useState('');
-    const [password, setPassword] = useState('');
+    const [motDePasse, setMotDePasse] = useState('');
     // const handleButtonPress = () => {
     //     navigation.navigate("Etudiant")
     // }
@@ -24,9 +24,10 @@ const StudentLogin = () => {
         try {
             const response = await axios.post(`${backendUrl}/authStudent`, {
                 matricule,
-                motDePasse: password,
+                motDePasse,
             });
-            console.log(response)
+
+            console.log(response.data)
             if (response.data.success) {
                 Dialog.show({
                     type: ALERT_TYPE.SUCCESS,
@@ -34,8 +35,10 @@ const StudentLogin = () => {
                     textBody: 'Bienvenue sur votre page',
                     button: 'Fermer',
                 });
-                console.log(response.data.studentId);
-                navigation.navigate('Etudiants', { studentId: response.data.studentId });
+                const studentId = response.data.studentId
+                navigation.navigate('Etudiant', { studentId: studentId });
+                // console.log(response.data.studentId)
+                // navigation.navigate('Etudiants', { studentId: response.data.studentId });
             } else {
                 Dialog.show({
                     type: ALERT_TYPE.WARNING,
@@ -105,8 +108,8 @@ const StudentLogin = () => {
                                 placeholder='Entrez votre mot de passe'
                                 placeholderTextColor={COLORS.bleu}
                                 // secureTextEntry
-                                value={password}
-                                onChangeText={(text) => setPassword(text)}
+                                value={motDePasse}
+                                onChangeText={(text) => setMotDePasse(text)}
                                 secureTextEntry={isPasswordShown}
                                 style={{
                                     width: "100%"

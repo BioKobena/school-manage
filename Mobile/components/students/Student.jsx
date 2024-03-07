@@ -28,8 +28,9 @@ const Student = ({ route }) => {
     return <AppLoading />
   }
 
+  console.log(route)
   const { studentId } = route.params || {};
-  console.log(studentId)
+  // console.log(route.params)
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [studentInfo, setStudentInfo] = useState(null);
@@ -46,9 +47,8 @@ const Student = ({ route }) => {
   useEffect(() => {
     const fetchStudentInfo = async () => {
       try {
-        const response = await axios.get(`${backendUrl}/students/${studentId}`);
-        console.log(response.data.student)
-        setStudentInfo(response.data.student);
+        // const response = await axios.get(`${backendUrl}/students/${studentId}`);
+        // setStudentInfo(response.data.student);
       } catch (error) {
         Dialog.show({
           type: ALERT_TYPE.DANGER,
@@ -56,6 +56,7 @@ const Student = ({ route }) => {
           textBody: "Erreur",
           button: 'fermer',
         })
+        // console.log(studentId)
         console.error('Erreur lors de la récupération des informations de l\'étudiant:', error);
       }
     };

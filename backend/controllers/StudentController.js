@@ -223,7 +223,6 @@ exports.searchStudents = async (req, res) => {
 
 exports.authenticateStudent = async (req, res) => {
   const { matricule, motDePasse } = req.body;
-
   try {
     const student = await Etudiant.findUnique({
       where: {

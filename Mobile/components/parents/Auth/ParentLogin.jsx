@@ -191,19 +191,40 @@
 
 // export default ParentLogin;
 
-import { View, Text, Image, SafeAreaView, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, Image, SafeAreaView, TextInput, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { StatusBar } from 'expo-status-bar'
 import { useNavigation } from '@react-navigation/native'
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import COLORS from '../../../constants/colors';
+import axios from 'axios'
+import { backendUrl } from '../../../api-server.config';
 
 const ParentLogin = () => {
     const navigation = useNavigation();
     const [isLoading, setIsLoading] = useState(false);
+    const [matricule, setMatricule] = useState('');
+    const [password, setPassword] = useState('');
 
-    const handleButtonPress = () => {
-        navigation.navigate("Parent")
+    const handleButtonPress = async () => {
+        console.log(matricule)
+        console.log(password)
+        try {
+            setIsLoading(true);
+            const response = await axios.post(`${backendUrl}/authParent`,{ username: matricule, password });
+            console.log(response)
+            
+
+            if (response.success) {
+                navigation.navigate("Parent");
+            } else {
+                console.error(data.error);
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsLoading(false);
+        }
     }
     return (
         <View style={styles.container}>
@@ -232,21 +253,24 @@ const ParentLogin = () => {
                         entering={FadeInDown.duration(1000).springify()}
                         style={{ backgroundColor: COLORS.grey, padding: 10, borderRadius: 5, width: "100%" }}
                     >
-
                         <TextInput
                             placeholder="Identifiant parent"
                             placeholderTextColor={COLORS.bleu}
+                            value={matricule}
+                            onChangeText={(text) => setMatricule(text)}
                         />
+
                     </Animated.View>
                     <Animated.View
                         entering={FadeInDown.delay(200).duration(1000).springify()}
                         style={{ backgroundColor: COLORS.grey, padding: 10, borderRadius: 5, width: "100%", marginBottom: 15 }}
                     >
-
                         <TextInput
                             placeholder="Mot de passe"
                             placeholderTextColor={COLORS.bleu}
                             secureTextEntry
+                            value={password}
+                            onChangeText={(text) => setPassword(text)}
                         />
                     </Animated.View>
 
