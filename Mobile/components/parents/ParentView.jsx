@@ -1,10 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { Dialog, ALERT_TYPE } from 'react-native-alert-notification';
 import axios from 'axios';
+import { backendUrl } from '../../api-server.config';
 
-const backendUrl = "http://192.168.1.83:3000"
 
 const ParentView = ({ route }) => {
+
+  useEffect(() => {
+
+    console.log(route.params)
+
+    if (route.params && route.params.loginSuccess) {
+      // Afficher la boîte de dialogue lorsque l'état de connexion réussie est vrai
+      Dialog.show({
+        type: ALERT_TYPE.SUCCESS,
+        title: 'Connexion réussie',
+        textBody: 'Bienvenue sur la page parent.',
+        button: 'Fermer',
+      });
+    }
+  }, [route.params]);
+
   // const { parentInfo } = route.params;
   // const etudiantInfo = parentInfo.etudiants[0];
   // const [studentInfo, setStudentInfo] = useState(null);
@@ -60,7 +77,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f4f4f4',
-    width:'100%'
+    width: '100%'
   },
   card: {
     backgroundColor: '#fff',
@@ -82,7 +99,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 16,
     color: '#333',
-    textAlign:'center'
+    textAlign: 'center'
   },
   infoContainer: {
     flexDirection: 'row',

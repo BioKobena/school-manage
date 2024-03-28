@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack"
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import Notifications from '../components/notifications/Notifications';
+import NotificationParentScreen from '../components/notifications/NotificationParent';
 import Welcome from './Welcome';
 import Student from '../components/students/Student';
 import StudentLogin from '../components/students/Auth/StudentLogin'
@@ -28,6 +29,7 @@ import COLORS from '../constants/colors';
 import Choose from './Choose';
 import AppLoading from 'expo-app-loading'
 import { useFonts } from 'expo-font';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Tab = createMaterialBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -39,7 +41,7 @@ const NotificationStack = createNativeStackNavigator()
 
 const ParentScreen = () => {
     return (
-        <ParentStack.Navigator initialRouteName='ParentView'>
+        <ParentStack.Navigator initialRouteName="ParentView">
             <ParentStack.Screen
                 name="ParentView"
                 component={ParentView}
@@ -90,7 +92,7 @@ function ParentStackScreen() {
     return (
         <ParentStack.Navigator>
             <ParentStack.Screen
-                name="Parents"
+                name="ParentScreen"
                 component={ParentScreen}
                 options={{
                     headerShown: false,
@@ -320,7 +322,7 @@ const ParentNavigationScreen = () => {
                         <MaterialCommunityIcons name="bell" color={color} size={26} />
                     ),
                 }}
-                name="Notifications" component={NotificationScreen} />
+                name="Notifications" component={NotificationParentScreen} />
         </Tab.Navigator>
     );
 }
@@ -344,8 +346,9 @@ function HomeStackScreen() {
 const StudentNavigationScreen = () => {
     return (
         <Tab.Navigator
-            activeColor={COLORS.blueLight}
-            inactiveColor={COLORS.grey}
+            activeColor={COLORS.white}
+            inactiveColor={COLORS.blueLight}
+            activeIndicatorStyle={{ backgroundColor: "transparent" }}
             barStyle={{ backgroundColor: COLORS.bleu, paddingBottom: 4 }}
             initialRouteName='Etudiants'
         >
@@ -386,6 +389,7 @@ const Navigation = () => {
                         headerShown: false
                     }}
                 />
+
                 <Stack.Screen
                     name="Etudiants"
                     component={StudentNavigationScreen}
@@ -393,6 +397,15 @@ const Navigation = () => {
                         headerShown: false
                     }}
                 />
+
+                <Stack.Screen
+                    name="Etudiant"
+                    component={StudentScreen}
+                    options={{
+                        headerShown: false
+                    }}
+                />
+
                 <Stack.Screen
                     name="Parent"
                     component={ParentNavigationScreen}
@@ -402,12 +415,14 @@ const Navigation = () => {
                 />
 
                 <Stack.Screen
-                    name="LoginParent"
+                    name="ParentLogin"
                     component={ParentLogin}
                     options={{
                         headerShown: false
                     }}
                 />
+
+
                 <Stack.Screen
                     name="Login"
                     component={StudentLogin}
@@ -415,6 +430,7 @@ const Navigation = () => {
                         headerShown: false
                     }}
                 />
+
                 <Stack.Screen
                     name="Choose"
                     component={Choose}

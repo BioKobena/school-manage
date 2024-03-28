@@ -28,7 +28,7 @@ const Choose = () => {
     }
 
     const handleParent = () => {
-        navigation.navigate("LoginParent")
+        navigation.navigate("ParentLogin")
     }
 
     return (
