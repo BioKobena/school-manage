@@ -1,9 +1,13 @@
 const Etudiant = require('../lib/prisma').etudiant
 const Parent = require('../lib/prisma').parent;
+const Classe = require("../lib/prisma").classe
+const Filiere = require("../lib/prisma").filiere
 const { parseISO, format } = require('date-fns');
 const { ObjectId } = require('mongodb');
 
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+
 
 const generateMatricule = () => {
   const currentYear = new Date().getFullYear().toString().slice(-2);
@@ -71,12 +75,30 @@ exports.createStudent = async (req, res) => {
 
 exports.getAllStudents = async (req, res) => {
   try {
-    const students = await Etudiant.findMany()
-    res.status(200).json({ students })
+    const students = await Etudiant.findMany({
+      include: {
+        filiere: true, // Inclure les détails de la filière pour chaque étudiant
+        classe: true   // Inclure les détails de la classe pour chaque étudiant
+      }
+    });
+
+    // Transformer l'ID de la filière en son nom
+    const studentsWithFiliereName = students.map(student => ({
+      ...student,
+      filiere: student.filiere ? student.filiere.nom : '' // Récupérer le nom de la filière si elle existe, sinon une chaîne vide
+    }));
+
+    // Transformer l'ID de la classe en son nom
+    const studentsWithClassNames = studentsWithFiliereName.map(student => ({
+      ...student,
+      classe: student.classe ? student.classe.nom : '' // Récupérer le nom de la classe si elle existe, sinon une chaîne vide
+    }));
+
+    res.status(200).json({ students: studentsWithClassNames });
   } catch (error) {
-    res.status(500).json({ "Erreur serveur": error })
+    res.status(500).json({ "Erreur serveur": error });
   }
-}
+};
 
 exports.getAllParents = async (req, res) => {
   try {
@@ -128,20 +150,20 @@ exports.deleteOneStudent = async (req, res) => {
 
 
 
-// exports.deleteOneStudent = async (req, res) => {
-//   const { id } = req.params
-//   try {
-//     const deleteStudent = await Etudiant.delete({
-//       where: {
-//         id
-//       }
-//     })
-//     res.status(200).json({ deleteStudent })
-//   } catch (error) {
-//     console.error(error)
-//     res.status(406).send({ error })
-//   }
-// }
+exports.deleteOneStudent = async (req, res) => {
+  const { id } = req.params
+  try {
+    const deleteStudent = await Etudiant.delete({
+      where: {
+        id
+      }
+    })
+    res.status(200).json({ deleteStudent })
+  } catch (error) {
+    console.error(error)
+    res.status(406).send({ error })
+  }
+}
 
 exports.searchStudents = async (req, res) => {
   try {
@@ -173,6 +195,7 @@ exports.authenticateStudent = async (req, res) => {
     });
 
     if (student && motDePasse === student.motDePasse) {
+      console.log("Authentification réussie avec succès !!!")
       res.status(200).json({ success: true, message: 'Authentification réussie', studentId: student.id });
       // .id);
     } else {
@@ -185,18 +208,14 @@ exports.authenticateStudent = async (req, res) => {
   }
 };
 
-
 exports.authenticateParent = async (req, res) => {
-  const { matricule, motDePasse } = req.body;
+  const { username, password } = req.body;
 
   try {
     const parent = await Parent.findUnique({
       where: {
-        matricule,
-      },
-      include: {
-        etudiants: true,
-      },
+        username,
+      }
     });
 
     if (!parent) {
@@ -206,14 +225,23 @@ exports.authenticateParent = async (req, res) => {
       });
     }
 
-    if (parent.motDePasse === motDePasse) {
+    if (parent && password === parent.password) {
+      // Une fois que l'authentification du parent est réussie, récupérez les étudiants associés à ce parent
+      const students = await Etudiant.findMany({
+        where: {
+          parentId: parent.id // Supposons que vous ayez un champ parentId dans votre modèle Etudiant pour lier les étudiants à leurs parents
+        }
+      });
+
+      console.log(students)
       res.status(200).json({
         success: true,
         message: 'Authentification réussie',
         parent,
+        students
       });
     } else {
-      res.status(401).json({
+      res.status(404).json({
         success: false,
         error: 'Matricule ou mot de passe incorrect pour le parent',
       });
@@ -253,4 +281,114 @@ exports.getStudentById = async (req, res) => {
 };
 
 
+exports.getAllClassesWithStudents = async (req, res) => {
+  try {
+    const classes = await Classe.findMany(); // Récupérer toutes les classes
+    const classesWithStudents = [];
+    for (const classe of classes) {
+      const students = await Etudiant.findMany({
+        where: {
+          classeId: classe.id
+        }
+      });
+      classesWithStudents.push({ classe, students });
+    }
+    res.status(200).json({ classes: classesWithStudents });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erreur serveur lors de la récupération des classes avec les étudiants associés' });
+  }
+};
 
+const Schedule = require('../lib/prisma').schedule;
+
+// Création d'un emploi du temps pour une classe spécifique
+// Création d'un emploi du temps pour une classe spécifique
+exports.createScheduleForClass = async (req, res) => {
+  const { classId } = req.params;
+  const { day, time, title } = req.body;
+
+  try {
+    const schedule = await Schedule.create({
+      data: {
+        day,
+        time,
+        title,
+        Classe: { connect: { id: classId } } // Utilisez "Classe" au lieu de "classe"
+      }
+    });
+    res.status(201).json({ success: true, schedule });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Erreur lors de la création de l\'emploi du temps pour la classe spécifiée' });
+  }
+};
+
+
+// Récupération de l'emploi du temps pour une classe spécifique
+exports.getScheduleForClass = async (req, res) => {
+  const { classId } = req.params;
+
+  try {
+    const schedule = await Schedule.findMany({
+      where: {
+        classeId: classId
+      }
+    });
+    res.status(200).json({ success: true, schedule });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Erreur lors de la récupération de l\'emploi du temps pour la classe spécifiée' });
+  }
+};
+
+// Mise à jour de l'emploi du temps
+exports.updateSchedule = async (req, res) => {
+  const { scheduleId } = req.params;
+  const { day, time, title } = req.body;
+
+  try {
+    const updatedSchedule = await Schedule.update({
+      where: {
+        id: scheduleId
+      },
+      data: {
+        day,
+        time,
+        title
+      }
+    });
+    res.status(200).json({ success: true, updatedSchedule });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Erreur lors de la mise à jour de l\'emploi du temps' });
+  }
+};
+
+// Suppression d'un cours de l'emploi du temps
+exports.deleteSchedule = async (req, res) => {
+  const { scheduleId } = req.params;
+
+  try {
+    await Schedule.delete({
+      where: {
+        id: scheduleId
+      }
+    });
+    res.status(200).json({ success: true, message: 'Cours supprimé de l\'emploi du temps avec succès' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Erreur lors de la suppression du cours de l\'emploi du temps' });
+  }
+};
+
+// Implémentation de la récupération de tous les emplois du temps
+exports.getAllSchedules = async (req, res) => {
+  try {
+    const schedules = await Schedule.findMany();
+    res.status(200).json({ success: true, schedules });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Erreur lors de la récupération de tous les emplois du temps' });
+  }
+};

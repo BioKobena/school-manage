@@ -42,15 +42,16 @@ model Etudiant {
   isActive          Boolean
   notifications     Notification[]
   notes             Note[]
+  Schedule          Schedule[]
 }
 
 /// Parent Model
 model Parent {
   id            String         @id @default(auto()) @map("_id") @db.ObjectId
-  username      String
+  username      String         @unique
   password      String
-  enfants       Etudiant[] 
-  notifications Notification[] 
+  enfants       Etudiant[]
+  notifications Notification[]
 }
 
 // Notification Model
@@ -99,4 +100,17 @@ model Classe {
   id        String     @id @default(auto()) @map("_id") @db.ObjectId
   nom       String
   etudiants Etudiant[]
+  Schedule  Schedule[]
+}
+
+// Schedule Model
+model Schedule {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  day        String
+  time       String
+  title      String
+  Etudiant   Etudiant? @relation(fields: [etudiantId], references: [id])
+  etudiantId String?   @db.ObjectId
+  Classe     Classe?   @relation(fields: [classeId], references: [id])
+  classeId   String?   @db.ObjectId
 }

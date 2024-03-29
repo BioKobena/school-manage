@@ -7,19 +7,21 @@ import Button from '../components/Button';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar'
+import Onboarding from 'react-native-onboarding-swiper';
+
 
 
 const Welcome = ({ navigation }) => {
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleWelcome = async () => {
-        setIsLoading(true);
-        setTimeout(() => {
-            setIsLoading(false);
-            navigation.navigate("Choose");
-        }, 1000);
-    };
+    // const handleWelcome = async () => {
+    //     setIsLoading(true);
+    //     setTimeout(() => {
+    //         setIsLoading(false);
+    //         navigation.navigate("Choose");
+    //     }, 1000);
+    // };
 
     let [fontsLoaded] = useFonts({
         'Poppins Thin': require('../assets/fonts/Poppins-Thin.ttf'),
@@ -31,6 +33,10 @@ const Welcome = ({ navigation }) => {
 
     })
 
+    const handleDone = () => {
+        navigation.navigate("Choose");
+    }
+
     return (
 
         <LinearGradient
@@ -41,6 +47,46 @@ const Welcome = ({ navigation }) => {
         >
             <StatusBar style="light" />
 
+
+            <Onboarding
+                containerStyles={{ paddingHorizontal: 15 }}
+
+                onDone={handleDone}
+                onSkip={handleDone}
+                pages={[
+                    {
+                        backgroundColor: '#a7f3d0',
+                        image: (
+                            <View View >
+                                <Text>À point nommé</Text>
+                            </View>
+                        ),
+                        title: 'Onboarding',
+                        subtitle: 'Done with React Native Onboarding Swiper',
+                    },
+                    {
+                        backgroundColor: '#fef3c7',
+                        image: (
+                            <View View >
+                                <Text>À point nommé</Text>
+                            </View>
+                        ),
+                        title: 'Onboarding',
+                        subtitle: 'Done with React Native Onboarding Swiper',
+                    },
+                    {
+                        backgroundColor: '#a78bfa',
+                        image: (
+                            <View View >
+                                <Text>À point nommé</Text>
+                            </View>
+                        ),
+                        title: 'Onboarding',
+                        subtitle: 'Done with React Native Onboarding Swiper',
+                    },
+                ]}
+            />
+            {/* 
             <View style={{ flex: 1 }}>
                 <View>
                     <Animated.View
@@ -144,9 +190,10 @@ const Welcome = ({ navigation }) => {
                         </View>
                     </Animated.View>
                     <Button
-                        title={isLoading ? "Chargement..." : "Suivant"}
+                        title={"Chargement"}
                         onPress={handleWelcome}
                         disabled={isLoading}
+
                         style={{
                             marginTop: 20,
                             width: "100%",
@@ -156,12 +203,12 @@ const Welcome = ({ navigation }) => {
                             justifyContent: "center",
                         }}
                     />
-                    {/* {isLoading && (
+                    {isLoading && (
                             <ActivityIndicator size="small" color={COLORS.white} style={{ marginLeft: -35 }} />
                         )}
-                    </Button> */}
+                    </Button>
                 </View>
-            </View>
+            </View> */}
         </LinearGradient >
     )
 }
