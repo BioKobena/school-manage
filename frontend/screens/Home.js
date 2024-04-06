@@ -276,6 +276,7 @@ function Nav() {
                         headerShown: false
                     }}
                 />
+                
                 <Stack.Screen
                     name="Home"
                     component={HomeScreen}

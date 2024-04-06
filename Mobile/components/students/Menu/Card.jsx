@@ -2,41 +2,43 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInLeft, FadeInUp } from 'react-native-reanimated';
 import axios from 'axios';
-import AppLoading from 'expo-app-loading'
+// import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import COLORS from '../../../constants/colors';
 import { LinearGradient } from "expo-linear-gradient";
-import SwitchComponent from '../../../constants/Switch';
+import { backendUrl } from '../../../api-server.config';
 
-
-const backendUrl = "http://192.168.1.83:3000"
 const Card = ({ route }) => {
-  // const { studentId } = route.params;
+  console.log(route)
+  const studentId = route.params.studentId;
   const [studentInfo, setStudentInfo] = useState(null);
 
-  let [fontsLoaded] = useFonts({
-    'Poppins Thin': require('../../../assets/fonts/Poppins-Thin.ttf'),
-    'Poppins Black': require('../../../assets/fonts/Poppins-BoldItalic.ttf'),
-    'Poppins Medium': require('../../../assets/fonts/Poppins-Medium.ttf'),
-    'Poppins Bold': require('../../../assets/fonts/Poppins-Bold.ttf'),
-    'Poppins SemiBold': require('../../../assets/fonts/Poppins-SemiBold.ttf'),
-    'Poppins Regular': require('../../../assets/fonts/Poppins-Regular.ttf'),
-  })
 
-  if (!fontsLoaded) {
-    return <AppLoading />
-  }
+  console.log(studentInfo)
+  // let [fontsLoaded] = useFonts({
+  //   'Poppins Thin': require('../../../assets/fonts/Poppins-Thin.ttf'),
+  //   'Poppins Black': require('../../../assets/fonts/Poppins-BoldItalic.ttf'),
+  //   'Poppins Medium': require('../../../assets/fonts/Poppins-Medium.ttf'),
+  //   'Poppins Bold': require('../../../assets/fonts/Poppins-Bold.ttf'),
+  //   'Poppins SemiBold': require('../../../assets/fonts/Poppins-SemiBold.ttf'),
+  //   'Poppins Regular': require('../../../assets/fonts/Poppins-Regular.ttf'),
+  // })
+
   useEffect(() => {
     const fetchStudentInfo = async () => {
       try {
-        // const response = await axios.get(`${backendUrl}/students/`);
-        // setStudentInfo(response.data.student);
+        const response = await axios.get(`${backendUrl}/students/${studentId}`);
+        setStudentInfo(response.data.student);
       } catch (error) {
         console.error('Erreur lors de la récupération des informations de l\'étudiant:', error);
       }
     };
     fetchStudentInfo();
-  }, []);
+  }, [studentId]);
+
+  // if (!fontsLoaded) {
+  //   return <SplashScreen />;
+  // }
 
   return (
     <View style={styles.card}>
@@ -70,23 +72,30 @@ const Card = ({ route }) => {
               <View style={styles.leftInfo}>
                 <Animated.Text
                   entering={FadeInDown.delay(500).duration(15000).springify()}
-                  style={styles.titleInfo}>Nom : <Text style={styles.infoEtudiant}>Kobena</Text> </Animated.Text>
+                  style={styles.titleInfo}>Nom : <Text style={styles.infoEtudiant}>{studentInfo && studentInfo.nom}</Text>
+                </Animated.Text>
                 <Animated.Text
                   entering={FadeInDown.delay(500).duration(15000).springify()}
-                  style={styles.titleInfo}>Prénoms : <Text style={styles.infoEtudiant}>Bio Paul</Text></Animated.Text>
+                  style={styles.titleInfo}>Prénoms : <Text style={styles.infoEtudiant}>{studentInfo && studentInfo.prenoms}</Text>
+                </Animated.Text>
                 <Animated.Text
                   entering={FadeInDown.delay(500).duration(15000).springify()}
-                  style={styles.titleInfo}>Né(e) : <Text style={styles.infoEtudiant}>15/04/2002</Text></Animated.Text>
+                  style={styles.titleInfo}>Né(e) : <Text style={styles.infoEtudiant}>15/04/2002</Text>
+                </Animated.Text>
                 <Animated.Text
                   entering={FadeInDown.delay(500).duration(15000).springify()}
-                  style={styles.titleInfo}>Mle : <Text style={styles.infoEtudiant}>20-ESATIC01BK</Text></Animated.Text>
+                  style={styles.titleInfo}>Mle : <Text style={styles.infoEtudiant}>{studentInfo && studentInfo.motDePasse}</Text>
+                </Animated.Text>
                 <Animated.Text
                   entering={FadeInDown.delay(500).duration(15000).springify()}
-                  style={styles.titleInfo}>Filière : <Text style={styles.infoEtudiant}>Génie Logiciel</Text></Animated.Text>
+                  style={styles.titleInfo}>Filière : <Text style={styles.infoEtudiant}>{studentInfo && studentInfo.filiere}</Text>
+                </Animated.Text>
                 <Animated.Text
                   entering={FadeInDown.delay(500).duration(15000).springify()}
-                  style={styles.titleInfo}>Statut : <Text style={styles.infoEtudiant}>Affecté(e) </Text></Animated.Text>
+                  style={styles.titleInfo}>Statut : <Text style={styles.infoEtudiant}>{studentInfo && (studentInfo.typeEtudiant === "affecte" ? "Affecté" : "Non affecté")}</Text>
+                </Animated.Text>
               </View>
+
               <View style={styles.rightInfo}>
                 <Animated.Image
                   entering={FadeInDown.delay(1500).duration(15000).springify()}
@@ -114,7 +123,7 @@ const Card = ({ route }) => {
         }}
         colors={[COLORS.blueLight, COLORS.bleu]}
       >
-        
+
         <TouchableOpacity style={[styles.cardContainer, styles.behindSide]}>
           <Animated.View
             entering={FadeInDown.delay(500).duration(1000).springify()}
@@ -150,7 +159,7 @@ const styles = StyleSheet.create({
     padding: 5,
     width: '100%',
     height: '100%',
-    fontFamily: "Poppins Bold",
+    // fontFamily: "Poppins Bold",
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -174,7 +183,7 @@ const styles = StyleSheet.create({
   },
   ipifName: {
     color: COLORS.light,
-    fontFamily: "Poppins SemiBold",
+    // fontFamily: "Poppins SemiBold",
     width: "55%",
     flexWrap: "wrap",
     textAlign: "center"
@@ -188,10 +197,10 @@ const styles = StyleSheet.create({
   },
   titleInfo: {
     color: COLORS.darkGray,
-    fontFamily: "Poppins Regular"
+    // fontFamily: "Poppins Regular"
   },
   infoEtudiant: {
-    fontFamily: "Poppins SemiBold",
+    // fontFamily: "Poppins SemiBold",
     color: COLORS.white
   },
   imageStudent: {
@@ -219,7 +228,7 @@ const styles = StyleSheet.create({
   school: {
     textAlign: "center",
     color: COLORS.grey,
-    fontFamily: "Poppins Regular",
+    // fontFamily: "Poppins Regular",
     fontSize: 12
   }
 

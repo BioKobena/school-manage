@@ -35,7 +35,7 @@ app.get('/api/classes', createClassroom.getClasse)
 
 // Routes pour l'emploi du temps
 app.post('/api/classes/:classId/timetable', studentOptions.createScheduleForClass);
-app.get('/api/classes/:classId/timetable', studentOptions.getScheduleForClass);
+app.get('/api/students/:classId/timetable', studentOptions.getScheduleForClass);
 app.put('/api/timetable/:scheduleId', studentOptions.updateSchedule);
 app.delete('/api/timetable/:scheduleId', studentOptions.deleteSchedule);
 app.get('/api/timetable', studentOptions.getAllSchedules);
@@ -71,7 +71,7 @@ app.get('/students/:id', studentOptions.getStudentById)
 
 
 // Route pour récupérer toutes les classes avec les étudiants associés
-app.get('/classes-with-students', studentOptions.getAllClassesWithStudents);
+app.get('/api/classes-with-students', studentOptions.getAllClassesWithStudents);
 
 
 app.get('/', (req, res) => {

@@ -1,25 +1,25 @@
 import { View, Text, StyleSheet, Button, Image, TouchableOpacity, TouchableHighlight } from 'react-native'
 import React, { useCallback } from 'react'
 import COLORS from '../constants/colors'
-import AppLoading from 'expo-app-loading'
+// import * as SplashScreen from 'expo-splash-screen';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar'
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 
 const Choose = () => {
-    let [fontsLoaded] = useFonts({
-        'Poppins Thin': require('../assets/fonts/Poppins-Thin.ttf'),
-        'Poppins Black': require('../assets/fonts/Poppins-BoldItalic.ttf'),
-        'Poppins Medium': require('../assets/fonts/Poppins-Medium.ttf'),
-        'Poppins Bold': require('../assets/fonts/Poppins-Bold.ttf'),
-        'Poppins SemiBold': require('../assets/fonts/Poppins-SemiBold.ttf'),
-        'Poppins Regular': require('../assets/fonts/Poppins-Regular.ttf'),
-    })
+    // let [fontsLoaded] = useFonts({
+    //     'Poppins Thin': require('../assets/fonts/Poppins-Thin.ttf'),
+    //     'Poppins Black': require('../assets/fonts/Poppins-BoldItalic.ttf'),
+    //     'Poppins Medium': require('../assets/fonts/Poppins-Medium.ttf'),
+    //     'Poppins Bold': require('../assets/fonts/Poppins-Bold.ttf'),
+    //     'Poppins SemiBold': require('../assets/fonts/Poppins-SemiBold.ttf'),
+    //     'Poppins Regular': require('../assets/fonts/Poppins-Regular.ttf'),
+    // })
 
-    if (!fontsLoaded) {
-        return <AppLoading />
-    }
+    // if (!fontsLoaded) {
+    //     return <SplashScreen />
+    // }
 
     const navigation = useNavigation();
 
@@ -38,7 +38,7 @@ const Choose = () => {
 
 
             <View style={{ zIndex: 10000, position: "absolute", gap: 10, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
-                <Text style={{ fontFamily: "Poppins Regular", fontSize: 25, textAlign: "justify", color: COLORS.white, marginBottom: 55 }}>Choisissez votre espace </Text>
+                <Text style={{fontSize: 25, textAlign: "justify", color: COLORS.white, marginBottom: 55 }}>Choisissez votre espace </Text>
                 <Animated.View
                     entering={FadeInDown.delay(400).duration(5000).springify()}
                 >
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
         elevation: 20,
     },
     textCase: {
-        fontFamily: 'Poppins Regular',
+        // fontFamily: 'Poppins Regular',
         color: COLORS.white,
         fontSize: 20,
         // fontWeight: "900"

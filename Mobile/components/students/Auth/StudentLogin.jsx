@@ -16,9 +16,7 @@ const StudentLogin = () => {
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [matricule, setMatricule] = useState('');
     const [motDePasse, setMotDePasse] = useState('');
-    // const handleButtonPress = () => {
-    //     navigation.navigate("Etudiant")
-    // }
+
     const handleLogin = async () => {
         setIsLoading(true);
         try {
@@ -36,9 +34,8 @@ const StudentLogin = () => {
                     button: 'Fermer',
                 });
                 const studentId = response.data.studentId
-                navigation.navigate('Etudiant', { studentId: studentId });
-                // console.log(response.data.studentId)
-                // navigation.navigate('Etudiants', { studentId: response.data.studentId });
+                console.log(studentId)
+                navigation.navigate('EtudiantHome', { studentId: studentId });
             } else {
                 Dialog.show({
                     type: ALERT_TYPE.WARNING,

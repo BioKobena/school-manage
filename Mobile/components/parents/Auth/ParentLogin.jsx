@@ -20,12 +20,9 @@ const ParentLogin = () => {
         try {   
             setIsLoading(true);
             const response = await axios.post(`${backendUrl}/authParent`, { username: matricule, password });
-            // console.log(response)
-
             if (response.data.success) {
-
-                // console.log(response.data.students)
-                navigation.navigate("Parent", { loginSuccess: true, students: response.data.students });
+                console.log(response.data.success)
+                navigation.navigate("ParentNav", { loginSuccess: true, students: response.data.students });
             } else if (response.data.success === false) {
                 Dialog.show({
                     type: ALERT_TYPE.WARNING,

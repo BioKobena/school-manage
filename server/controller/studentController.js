@@ -2,7 +2,6 @@ const Etudiant = require('../lib/prisma').etudiant
 const Parent = require('../lib/prisma').parent;
 const Classe = require("../lib/prisma").classe
 const Filiere = require("../lib/prisma").filiere
-const { parseISO, format } = require('date-fns');
 const { ObjectId } = require('mongodb');
 
 const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -115,6 +114,9 @@ exports.getOneStudent = async (req, res) => {
     const student = await Etudiant.findUnique({
       where: {
         id
+      },
+      include: {
+        classe: true // Inclure les détails de la classe pour l'étudiant spécifié
       }
     })
     res.json({ student })
@@ -265,12 +267,28 @@ exports.getStudentById = async (req, res) => {
 
     const student = await Etudiant.findUnique({
       where: {
-        id: id, // Utilise la chaîne directement
+        id: id,
+      },
+      include: {
+        filiere: true, // Inclure les détails de la filière pour l'étudiant
+        classe: true   // Inclure les détails de la classe pour l'étudiant
       }
     });
 
     if (student) {
-      res.status(200).json({ success: true, student });
+      // Transformer l'ID de la filière en son nom
+      const studentWithFiliereName = {
+        ...student,
+        filiere: student.filiere ? student.filiere.nom : '' // Récupérer le nom de la filière si elle existe, sinon une chaîne vide
+      };
+
+      // Transformer l'ID de la classe en son nom
+      const studentWithClassName = {
+        ...studentWithFiliereName,
+        classe: studentWithFiliereName.classe ? studentWithFiliereName.classe.nom : '' // Récupérer le nom de la classe si elle existe, sinon une chaîne vide
+      };
+
+      res.status(200).json({ success: true, student: studentWithClassName });
     } else {
       res.status(404).json({ success: false, error: 'Étudiant non trouvé' });
     }
@@ -301,9 +319,6 @@ exports.getAllClassesWithStudents = async (req, res) => {
 };
 
 const Schedule = require('../lib/prisma').schedule;
-
-// Création d'un emploi du temps pour une classe spécifique
-// Création d'un emploi du temps pour une classe spécifique
 exports.createScheduleForClass = async (req, res) => {
   const { classId } = req.params;
   const { day, time, title } = req.body;
@@ -324,23 +339,27 @@ exports.createScheduleForClass = async (req, res) => {
   }
 };
 
-
 // Récupération de l'emploi du temps pour une classe spécifique
 exports.getScheduleForClass = async (req, res) => {
-  const { classId } = req.params;
-
   try {
-    const schedule = await Schedule.findMany({
+    const { classId } = req.params; // Utilisation de classId au lieu de classeId
+    if (!classId) {
+      return res.status(400).json({ success: false, error: 'Identifiant de classe manquant' });
+    }
+
+    const schedules = await Schedule.findMany({
       where: {
-        classeId: classId
+        Classe: { id: classId } // Filtrer par l'ID de la classe
       }
     });
-    res.status(200).json({ success: true, schedule });
+    res.status(200).json({ success: true, schedules });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: 'Erreur lors de la récupération de l\'emploi du temps pour la classe spécifiée' });
   }
 };
+
+
 
 // Mise à jour de l'emploi du temps
 exports.updateSchedule = async (req, res) => {

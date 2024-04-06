@@ -30,7 +30,8 @@ const data = [
   // Ajoutez d'autres matières avec leurs évaluations
 ];
 
-const Marks = () => {
+const Marks = ({route}) => {
+  console.log(route.params.studentInfo)
   const renderMarkItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <Text style={styles.subject}>{item.subject}</Text>

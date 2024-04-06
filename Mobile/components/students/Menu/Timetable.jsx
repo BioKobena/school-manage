@@ -1,19 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Agenda } from 'react-native-calendars';
+import axios from 'axios';
+import { backendUrl } from '../../../api-server.config';
 
-const Timetable = () => {
-  const items = {
-    '2024-03-01': [
-      { name: 'Cours de Mathématiques', time: '08:00 AM' },
-      { name: 'Cours de Physique', time: '10:00 AM' },
-    ],
-    '2024-03-02': [
-      { name: 'Cours de Français', time: '09:30 AM' },
-      { name: "Cours d'Anglais", time: '01:00 PM' },
-    ],
-    // Add more events as needed
-  };
+const Timetable = ({ route }) => {
+  const studentId = route.params.studentInfo;
+  const [items, setItems] = useState({});
+
+  useEffect(() => {
+    const fetchTimetable = async () => {
+      try {
+        const response = await axios.get(`${backendUrl}/api/students/${studentId.classeId}/timetable`);
+        const timetableData = response.data;
+
+        // Convertir les données de l'emploi du temps reçues en un format accepté par Agenda
+        const formattedItems = {};
+
+        // Boucler sur les données de l'emploi du temps et les organiser par date
+        timetableData.schedules.forEach((schedule) => {
+          const { day, time, title } = schedule;
+          const formattedDate = day.split('T')[0]; // Récupérer la date sans l'heure
+          if (!formattedItems[formattedDate]) {
+            formattedItems[formattedDate] = [];
+          }
+          formattedItems[formattedDate].push({ name: title, time });
+        });
+
+        setItems(formattedItems);
+      } catch (error) {
+        console.error('Erreur lors de la récupération de l\'emploi du temps:', error);
+      }
+    };
+
+    fetchTimetable();
+  }, []);
 
   const renderItem = (item) => (
     <View style={styles.item}>
@@ -26,13 +47,11 @@ const Timetable = () => {
     <View style={styles.container}>
       <Agenda
         items={items}
-        renderItem={(item) => renderItem(item)}
+        renderItem={renderItem}
         renderEmptyDate={() => <View />}
         rowHasChanged={(r1, r2) => r1.name !== r2.name}
-        // Définir les clés pour les jours de la semaine
-        // et ajuster les valeurs en fonction des besoins
-        pastScrollRange={7} // Afficher les 7 jours passés
-        futureScrollRange={7} // Afficher les 7 jours futurs
+        pastScrollRange={7}
+        futureScrollRange={7}
         theme={{
           agendaDayTextColor: 'yellow',
           agendaDayNumColor: 'green',

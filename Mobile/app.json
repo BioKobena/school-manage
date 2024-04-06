@@ -1,13 +1,13 @@
 {
   "expo": {
-    "name": "Mobile",
-    "slug": "Mobile",
+    "name": "IPIF",
+    "slug": "IPIF",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo-ipif.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo-ipif.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -19,12 +19,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/logo-ipif.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.bio_paul.IPIF"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/logo-ipif.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "93cf2600-cf92-4e98-b73c-90f20676410e"
+      }
     }
   }
 }

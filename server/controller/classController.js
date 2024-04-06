@@ -1,6 +1,5 @@
 const Class = require('../lib/prisma').classe
 
-
 exports.createClass = async (req, res) => {
     const { nom } = req.body
     try {

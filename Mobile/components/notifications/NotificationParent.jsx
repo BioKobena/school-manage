@@ -7,19 +7,21 @@ const Tab = createMaterialTopTabNavigator();
 
 const NotificationParentScreen = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+    
+    >
       <Tab.Screen
         name="Nouvelles Notifications"
         component={NewNotificationsScreen}
         options={{
-          
+
         }}
       />
       <Tab.Screen
         name="Historique des Notifications"
         component={HistoryNotificationsScreen}
         options={{
-         
+
         }}
       />
     </Tab.Navigator>
@@ -68,6 +70,7 @@ const NotificationItem = ({ icon, color, text }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
+    marginTop: 20
   },
   notificationItem: {
     flexDirection: 'row',

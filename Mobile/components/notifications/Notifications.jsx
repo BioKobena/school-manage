@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import COLORS from '../../constants/colors';
+
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -12,8 +14,16 @@ const NotificationsScreen = () => {
         name="Nouvelles Notifications"
         component={NewNotificationsScreen}
         options={{
-          
-        }}
+          headerStyle: {
+              backgroundColor: COLORS.blueLogin,
+          },
+          headerTintColor: COLORS.white,
+          headerTitleStyle: {
+              fontFamily: "Poppins SemiBold"
+          },
+          headerBackVisible: false,
+          headerTitleAlign: "center"
+      }}
       />
       <Tab.Screen
         name="Historique des Notifications"

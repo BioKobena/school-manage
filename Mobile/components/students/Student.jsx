@@ -1,5 +1,5 @@
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator, Modal } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import COLORS from '../../constants/colors';
 import { features } from '../../constants/features';
@@ -11,25 +11,101 @@ import { ALERT_TYPE, Dialog } from 'react-native-alert-notification';
 import { backendUrl } from '../../api-server.config';
 import { StatusBar } from 'expo-status-bar';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+// import * as SplashScreen from 'expo-splash-screen';
+import messaging from '@react-native-firebase/messaging';
+import ToastManager, { Toast } from 'toastify-react-native'
+
+
+
 
 
 const Student = ({ route }) => {
 
-  let [fontsLoaded] = useFonts({
-    'Poppins Thin': require('../../assets/fonts/Poppins-Thin.ttf'),
-    'Poppins Black': require('../../assets/fonts/Poppins-BoldItalic.ttf'),
-    'Poppins Medium': require('../../assets/fonts/Poppins-Medium.ttf'),
-    'Poppins Bold': require('../../assets/fonts/Poppins-Bold.ttf'),
-    'Poppins SemiBold': require('../../assets/fonts/Poppins-SemiBold.ttf'),
-    'Poppins Regular': require('../../assets/fonts/Poppins-Regular.ttf'),
-  })
+  // const requestUserPermission = async () => {
+  //   const authStatus = await messaging().requestPermission();
+  //   const enabled =
+  //     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+  //     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-  if (!fontsLoaded) {
-    return <AppLoading />
-  }
+  //   if (enabled) {
+  //     console.log('Authorization status:', authStatus);
+  //   }
+  // }
+
+
+
+  // useEffect(() => {
+
+  //   if (requestUserPermission()) {
+  //     messaging().getToken().then((token) => {
+  //       console.log("first time Token : ", token)
+  //       sendTokenToBackend(token)
+  //       console.log(sendTokenToBackend)
+  //     })
+  //   } else {
+  //     console.log("authStatus", authStatus)
+  //   }
+
+  //   messaging().getInitialNotification().then(async (remoteMessage) => {
+  //     if (remoteMessage) {
+  //       console.log("Notification caused opened App", remoteMessage.notification);
+  //     }
+  //   })
+
+
+  //   messaging().onNotificationOpenedApp(async (remoteMessage) => {
+  //     console.log("Notification on open app", remoteMessage.notification)
+  //   })
+
+
+  //   messaging().setBackgroundMessageHandler(async (remoteMessage) => {
+  //     console.log("Message handled in background", remoteMessage)
+  //   })
+
+  //   const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+  //     Toast.success(remoteMessage.notification.body)
+  //     // Alert.alert("A new FCM message arrived !", JSON.stringify(remoteMessage.notification))
+  //   })
+
+  //   return unsubscribe
+  // }, [])
+
+
+  // const sendTokenToBackend = async (token) => {
+  //   try {
+  //     const response = await axios.post(`${api}/token`, { token }); // Envoyer le token à votre backend
+  //     console.log('Réponse de l\'API :', response.data);
+  //   } catch (error) {
+  //     console.error('Erreur lors de l\'envoi du token au backend :', error);
+  //   }
+  // }
+
+
+  // const [notifications, setNotifications] = useState([])
+  // useEffect(async () => {
+  //   try {
+  //     const response = await axios.get(`${api}/getNotifications`);
+  //     console.log(response.data.notifications)
+  //     setNotifications(response.data.notifications)
+  //   } catch (error) {
+  //     console.error('Erreur lors de l\'envoi du token au backend :', error);
+  //   }
+
+  // }, [])
+
+
+  // let [fontsLoaded] = useFonts({
+  //   'Poppins Thin': require('../../assets/fonts/Poppins-Thin.ttf'),
+  //   'Poppins Black': require('../../assets/fonts/Poppins-BoldItalic.ttf'),
+  //   'Poppins Medium': require('../../assets/fonts/Poppins-Medium.ttf'),
+  //   'Poppins Bold': require('../../assets/fonts/Poppins-Bold.ttf'),
+  //   'Poppins SemiBold': require('../../assets/fonts/Poppins-SemiBold.ttf'),
+  //   'Poppins Regular': require('../../assets/fonts/Poppins-Regular.ttf'),
+  // })
+
 
   console.log(route)
-  const { studentId } = route.params || {};
+  const studentId = route.params.studentData || {};
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(false);
   const [studentInfo, setStudentInfo] = useState(null);
@@ -39,7 +115,7 @@ const Student = ({ route }) => {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsLoading(false);
-    navigation.navigate(navigationKey)
+    // navigation.navigate(navigationKey)
     navigation.navigate(navigationKey, { studentInfo, studentId });
   };
 
@@ -55,7 +131,6 @@ const Student = ({ route }) => {
           textBody: "Erreur",
           button: 'fermer',
         })
-        // console.log(studentId)
         console.error('Erreur lors de la récupération des informations de l\'étudiant:', error);
       }
     };
@@ -66,6 +141,11 @@ const Student = ({ route }) => {
   const handleLogout = () => {
     navigation.navigate('Welcome')
   }
+
+  // if (!fontsLoaded) {
+  //   return <SplashScreen />
+  // }
+
   return (
     <>
 
@@ -127,7 +207,7 @@ const Student = ({ route }) => {
                   marginVertical: 6,
                   flexWrap: "wrap",
                   color: "#043b5c",
-                  fontFamily: "Poppins SemiBold"
+                  // fontFamily: "Poppins SemiBold"
                 }}
               >{studentInfo ? `${studentInfo.nom} ${studentInfo.prenoms}` : 'Bio Paul Kobena'}</Text>
               <Text
@@ -136,17 +216,17 @@ const Student = ({ route }) => {
                   color: COLORS.orangeColor,
                   flexWrap: "wrap",
                   zIndex: 1000,
-                  fontFamily: "Poppins Medium"
+                  // fontFamily: "Poppins Medium"
 
                 }}
-              >{studentInfo ? studentInfo.filiere : 'Genie Logiciel'}</Text>
+              >{studentInfo ? studentInfo.classe : 'Genie Logiciel'}</Text>
               <Text
                 style={{
                   fontSize: 16,
                   color: "#111",
                   flexWrap: "wrap",
                   fontWeight: "600",
-                  fontFamily: "Poppins SemiBold"
+                  // fontFamily: "Poppins SemiBold"
                 }}
               >{studentInfo ? studentInfo.filiere : 'Master 1'}</Text>
             </Animated.View>
@@ -204,7 +284,7 @@ const styles = StyleSheet.create({
   cardTextOne: {
     color: "#eff5f7",
     fontSize: 18,
-    fontFamily: "Poppins Regular"
+    // fontFamily: "Poppins Regular"
   },
   menuEl: {
     flex: 1,
